@@ -3,7 +3,7 @@
 USE tienda_db;
 
 -- CATEGORÍAS
-INSERT INTO Categoria (nombre_categoria, descripcion_categoria) VALUES
+INSERT INTO categoria (nombre_categoria, descripcion_categoria) VALUES
 ('Electrónica',          'Dispositivos electrónicos y accesorios tecnológicos'),
 ('Computación',          'Equipos de cómputo, periféricos y componentes'),
 ('Telefonía',            'Teléfonos móviles, accesorios y repuestos'),
@@ -17,7 +17,7 @@ INSERT INTO Categoria (nombre_categoria, descripcion_categoria) VALUES
 
 
 -- PROVEEDORES
-INSERT INTO Proveedor (nombre_proveedor, direccion_proveedor) VALUES
+INSERT INTO proveedor (nombre_proveedor, direccion_proveedor) VALUES
 ('TechDistrib S.A.',        '5a Av. 10-23, Zona 1, Ciudad de Guatemala'),
 ('ElectroImport Ltda.',     '18 Calle 5-67, Zona 12, Ciudad de Guatemala'),
 ('MegaSupplies Corp.',      '2a Calle 3-40, Zona 4, Ciudad de Guatemala'),
@@ -30,7 +30,7 @@ INSERT INTO Proveedor (nombre_proveedor, direccion_proveedor) VALUES
 ('HomePlus Distribuidores', 'Calzada Aguilar Batres 30-56, Zona 12');
 
 -- Teléfonos de proveedores
-INSERT INTO TelefonoProveedor (id_proveedor, telefono) VALUES
+INSERT INTO telefono_proveedor (id_proveedor, telefono) VALUES
 (1,'2250-1100'),(1,'5501-2233'),
 (2,'2260-4400'),(2,'4455-6677'),
 (3,'2270-8800'),(3,'5588-9900'),
@@ -43,7 +43,7 @@ INSERT INTO TelefonoProveedor (id_proveedor, telefono) VALUES
 (10,'2295-0000'),(10,'4400-1122');
 
 -- Correos de proveedores
-INSERT INTO CorreoProveedor (id_proveedor, correo) VALUES
+INSERT INTO correo_proveedor (id_proveedor, correo) VALUES
 (1,'ventas@techdistrib.com.gt'),
 (2,'info@electroimport.com.gt'),
 (3,'pedidos@megasupplies.com.gt'),
@@ -56,7 +56,7 @@ INSERT INTO CorreoProveedor (id_proveedor, correo) VALUES
 (10,'ventas@homeplus.com.gt');
 
 -- EMPLEADOS
-INSERT INTO Empleado (nombre_empleado, username, hash_contrasena, cargo, fecha_contratacion, estado) VALUES
+INSERT INTO empleado (nombre_empleado, username, hash_contrasena, cargo, fecha_contratacion, estado) VALUES
 ('Carlos Mendoza Pérez',    'carlos.mendoza',  '$2b$12$abc1234567890ABCDEFGHIJ', 'Gerente General',    '2018-03-15', 'activo'),
 ('Ana Lucía Rodríguez',     'ana.rodriguez',   '$2b$12$def1234567890ABCDEFGHIJ', 'Jefe de Ventas',     '2019-07-01', 'activo'),
 ('Diego Fuentes López',     'diego.fuentes',   '$2b$12$ghi1234567890ABCDEFGHIJ', 'Vendedor',           '2020-01-10', 'activo'),
@@ -69,12 +69,12 @@ INSERT INTO Empleado (nombre_empleado, username, hash_contrasena, cargo, fecha_c
 ('Valeria Ortiz Chan',      'valeria.ortiz',   '$2b$12$yzb1234567890ABCDEFGHIJ', 'Asistente',          '2024-01-08', 'inactivo');
 
 -- Teléfonos de empleados
-INSERT INTO TelefonoEmpleado (id_empleado, telefono) VALUES
+INSERT INTO telefono_empleado (id_empleado, telefono) VALUES
 (1,'5100-0001'),(2,'5100-0002'),(3,'5100-0003'),(4,'5100-0004'),(5,'5100-0005'),
 (6,'5100-0006'),(7,'5100-0007'),(8,'5100-0008'),(9,'5100-0009'),(10,'5100-0010');
 
 -- Correos de empleados
-INSERT INTO CorreoEmpleado (id_empleado, correo) VALUES
+INSERT INTO correo_empleado (id_empleado, correo) VALUES
 (1,'carlos.mendoza@tienda.com'),
 (2,'ana.rodriguez@tienda.com'),
 (3,'diego.fuentes@tienda.com'),
@@ -88,7 +88,7 @@ INSERT INTO CorreoEmpleado (id_empleado, correo) VALUES
 
 
 -- CLIENTES 
-INSERT INTO Cliente (nombre_cliente, observaciones) VALUES
+INSERT INTO cliente (nombre_cliente, observaciones) VALUES
 ('Juan Pablo Alvarado',     'Cliente frecuente, prefiere pago en efectivo'),
 ('Sandra Patricia Lima',    NULL),
 ('Fernando Estrada Ruiz',   'Empresa: Estrada & Asociados'),
@@ -121,7 +121,7 @@ INSERT INTO Cliente (nombre_cliente, observaciones) VALUES
 ('Rosario Concepción León', NULL);
 
 -- Teléfonos de clientes
-INSERT INTO TelefonoCliente (id_cliente, numero) VALUES
+INSERT INTO telefono_cliente (id_cliente, numero) VALUES
 (1,'5200-0001'),(2,'5200-0002'),(3,'5200-0003'),(4,'5200-0004'),(5,'5200-0005'),
 (6,'5200-0006'),(7,'5200-0007'),(8,'5200-0008'),(9,'5200-0009'),(10,'5200-0010'),
 (11,'5200-0011'),(12,'5200-0012'),(13,'5200-0013'),(14,'5200-0014'),(15,'5200-0015'),
@@ -130,7 +130,7 @@ INSERT INTO TelefonoCliente (id_cliente, numero) VALUES
 (26,'5200-0026'),(27,'5200-0027'),(28,'5200-0028'),(29,'5200-0029'),(30,'5200-0030');
 
 -- Correos de clientes
-INSERT INTO CorreoCliente (id_cliente, correo) VALUES
+INSERT INTO correo_cliente (id_cliente, correo) VALUES
 (1,'jalvarado@gmail.com'),(2,'sandra.lima@hotmail.com'),(3,'festrada@estrada.com.gt'),
 (4,'karla.sanchez@gmail.com'),(5,'maperez@empresa.com.gt'),(6,'i.vega@outlook.com'),
 (7,'amendez@mayorista.com'),(8,'luciaf.castro@gmail.com'),(9,'pablo.morales@gmail.com'),
@@ -140,7 +140,7 @@ INSERT INTO CorreoCliente (id_cliente, correo) VALUES
 (19,'gramire@outlook.com'),(20,'rosa.monzon@gmail.com');
 
 -- PRODUCTOS  (30)
-INSERT INTO Producto (id_categoria, id_proveedor, nombre_producto, descripcion_producto,
+INSERT INTO producto (id_categoria, id_proveedor, nombre_producto, descripcion_producto,
                       precio_compra, precio_venta, stock_actual) VALUES
 -- Electrónica (1)
 (1,1,'Cargador USB-C 65W',        'Cargador rápido USB-C 65 W compatible con laptops y móviles',     85.00,  149.99,  80),
@@ -184,7 +184,7 @@ INSERT INTO Producto (id_categoria, id_proveedor, nombre_producto, descripcion_p
 (10,1,'Hub USB 3.0 x4',           'Hub USB 3.0 de 4 puertos con indicadores LED, cable 50cm',         65.00,  124.99,  60);
 
 -- VENTAS 
-INSERT INTO Venta (id_empleado, id_cliente, fecha_hora_venta, total) VALUES
+INSERT INTO venta (id_empleado, id_cliente, fecha_hora_venta, total) VALUES
 (3,  1,  '2026-01-05 09:15:00',  599.98),
 (4,  2,  '2026-01-07 10:30:00',  349.99),
 (3,  3,  '2026-01-10 11:00:00', 1049.98),
@@ -217,7 +217,7 @@ INSERT INTO Venta (id_empleado, id_cliente, fecha_hora_venta, total) VALUES
 (5,  30, '2026-03-28 14:30:00',  349.99);
 
 -- DETALLE VENTA 
-INSERT INTO DetalleVenta (id_venta, id_producto, cantidad, precio_unitario, subtotal) VALUES
+INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario, subtotal) VALUES
 -- Venta 1
 (1, 6, 1, 599.99, 599.99),
 -- Venta 2
