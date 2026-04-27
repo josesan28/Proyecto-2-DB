@@ -18,5 +18,19 @@ app.get("/api/ping", async (req, res) => {
   }
 });
 
+// Rutas
+app.use("/api/productos",   require("./routes/productos"));
+
+// Manejo de rutas no encontradas
+app.use((req, res) => {
+  res.status(404).json({ error: "Ruta no encontrada" });
+});
+
+//Manejo global de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Error interno del servidor" });
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Backend corriendo en puerto ${PORT}`));
