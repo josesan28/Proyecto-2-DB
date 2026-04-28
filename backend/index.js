@@ -18,17 +18,15 @@ app.get("/api/ping", async (req, res) => {
   }
 });
 
-// Rutas
-app.use("/api/productos", require("./routes/productos"));
+app.use("/api/productos",   require("./routes/productos"));
+app.use("/api/clientes",    require("./routes/clientes"));
 app.use("/api/proveedores", require("./routes/proveedores"));
-app.use("/api/empleados", require("./routes/empleados"));
+app.use("/api/empleados",   require("./routes/empleados"));
 
-// Manejo de rutas no encontradas
 app.use((req, res) => {
   res.status(404).json({ error: "Ruta no encontrada" });
 });
 
-//Manejo global de errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Error interno del servidor" });
