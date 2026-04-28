@@ -19,8 +19,9 @@ app.get("/api/ping", async (req, res) => {
 });
 
 // Rutas
-app.use("/api/productos",   require("./routes/productos"));
+app.use("/api/productos", require("./routes/productos"));
 app.use("/api/proveedores", require("./routes/proveedores"));
+app.use("/api/empleados", require("./routes/empleados"));
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {
