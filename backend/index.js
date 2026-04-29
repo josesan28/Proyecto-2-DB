@@ -18,10 +18,11 @@ app.get("/api/ping", async (req, res) => {
   }
 });
 
-app.use("/api/productos",   require("./routes/productos"));
-app.use("/api/clientes",    require("./routes/clientes"));
+app.use("/api/productos", require("./routes/productos"));
+app.use("/api/clientes", require("./routes/clientes"));
 app.use("/api/proveedores", require("./routes/proveedores"));
-app.use("/api/empleados",   require("./routes/empleados"));
+app.use("/api/empleados", require("./routes/empleados"));
+app.use("/api/ventas", require("./routes/ventas"));
 
 app.use((req, res) => {
   res.status(404).json({ error: "Ruta no encontrada" });
