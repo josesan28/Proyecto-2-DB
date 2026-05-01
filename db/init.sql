@@ -183,3 +183,18 @@ CREATE INDEX idx_venta_fecha ON venta (fecha_hora_venta);
 
 -- Ventas por empleado
 CREATE INDEX idx_venta_empleado ON venta (id_empleado);
+
+-- Vista: ingresos y unidades vendidas agrupados por categoría
+
+CREATE OR REPLACE VIEW vista_ventas_por_categoria AS
+SELECT
+  c.id_categoria,
+  c.nombre_categoria,
+  COUNT(DISTINCT v.id_venta) AS total_ventas,
+  COALESCE(SUM(dv.cantidad), 0) AS unidades_vendidas,
+  COALESCE(SUM(dv.subtotal), 0) AS ingresos_totales
+FROM categoria c
+LEFT JOIN producto p ON p.id_categoria = c.id_categoria
+LEFT JOIN detalle_venta dv ON dv.id_producto = p.id_producto
+LEFT JOIN venta v  ON dv.id_venta = v.id_venta
+GROUP BY c.id_categoria, c.nombre_categoria;
