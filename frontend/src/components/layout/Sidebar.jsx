@@ -1,23 +1,24 @@
 import { NavLink } from 'react-router-dom'
+import { BarChart3, Home, Package2, ShoppingCart, Tags, Truck, UserRound, Users, Store } from 'lucide-react'
 import './Sidebar.css'
 
 const links = [
-  { to: '/',             label: 'Inicio',       icon: '⊞' },
-  { to: '/productos',    label: 'Productos',    icon: '▣' },
-  { to: '/categorias',   label: 'Categorías',   icon: '◈' },
-  { to: '/proveedores',  label: 'Proveedores',  icon: '◎' },
-  { to: '/clientes',     label: 'Clientes',     icon: '◉' },
-  { to: '/empleados',    label: 'Empleados',    icon: '◐' },
-  { to: '/ventas',       label: 'Ventas',       icon: '◆' },
-  { to: '/reportes',     label: 'Reportes',     icon: '◇' },
+  { to: '/', label: 'Inicio', icon: Home },
+  { to: '/productos', label: 'Productos', icon: Package2 },
+  { to: '/categorias', label: 'Categorías', icon: Tags },
+  { to: '/proveedores', label: 'Proveedores', icon: Truck },
+  { to: '/clientes', label: 'Clientes', icon: Users },
+  { to: '/empleados', label: 'Empleados', icon: UserRound },
+  { to: '/ventas', label: 'Ventas', icon: ShoppingCart },
+  { to: '/reportes', label: 'Reportes', icon: BarChart3 },
 ]
 
 export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <span className="brand-icon">◈</span>
-        <span className="brand-name">Tienda</span>
+        <span className="brand-icon"><Store /></span>
+        <span className="brand-name">Eka</span>
       </div>
       <nav className="sidebar-nav">
         {links.map(l => (
@@ -27,7 +28,7 @@ export default function Sidebar() {
             end={l.to === '/'}
             className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}
           >
-            <span className="nav-icon">{l.icon}</span>
+            <l.icon className="nav-icon" size={18} strokeWidth={2.1} />
             {l.label}
           </NavLink>
         ))}
