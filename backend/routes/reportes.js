@@ -39,8 +39,8 @@ router.get("/ventas-completas", async (req, res) => {
         e.cargo,
         COALESCE(c.nombre_cliente, 'Consumidor final') AS nombre_cliente
       FROM venta v
-      JOIN empleado e        ON v.id_empleado = e.id_empleado
-      LEFT JOIN cliente c    ON v.id_cliente  = c.id_cliente
+      JOIN empleado e ON v.id_empleado = e.id_empleado
+      LEFT JOIN cliente c ON v.id_cliente  = c.id_cliente
       ORDER BY v.fecha_hora_venta DESC
     `);
     res.json(rows);
@@ -81,7 +81,7 @@ router.get("/detalle-ventas", async (req, res) => {
 router.get("/clientes-con-ventas", async (req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT id_cliente, nombre_cliente, observaciones
+      SELECT id_cliente, nombre_cliente, COALESCE(observaciones, 'Sin observaciones') AS observaciones
       FROM cliente
       WHERE id_cliente IN (
         SELECT DISTINCT id_cliente
@@ -96,7 +96,7 @@ router.get("/clientes-con-ventas", async (req, res) => {
   }
 });
 
-// Subconsulta 2 correlacionada: Empleados con mas ventas que el promedio de su cargo
+// Subconsulta 2 correlacionada: Empleados con más ventas que el promedio de su cargo
 // GET /api/reportes/empleados-sobre-promedio-cargo
 router.get("/empleados-sobre-promedio-cargo", async (req, res) => {
   try {
@@ -151,9 +151,9 @@ router.get("/ventas-por-empleado", async (req, res) => {
         e.nombre_empleado,
         e.cargo,
         COUNT(v.id_venta) AS total_ventas,
-        COALESCE(SUM(v.total), 0) AS monto_total,
-        COALESCE(AVG(v.total), 0) AS monto_promedio,
-        COALESCE(MAX(v.total), 0) AS venta_maxima
+        ROUND(COALESCE(SUM(v.total), 0), 2) AS monto_total,
+        ROUND(COALESCE(AVG(v.total), 0), 2) AS monto_promedio,
+        ROUND(COALESCE(MAX(v.total), 0), 2) AS venta_maxima
       FROM empleado e
       LEFT JOIN venta v ON e.id_empleado = v.id_empleado
       GROUP BY e.id_empleado, e.nombre_empleado, e.cargo
@@ -210,12 +210,9 @@ router.get("/ranking-clientes", async (req, res) => {
         nombre_cliente,
         total_compras,
         monto_total,
-        (SELECT AVG(monto_total) FROM resumen_clientes) AS promedio_general,
-        (SELECT MAX(monto_total) FROM resumen_clientes) AS maximo_general,
-        (SELECT COUNT(*) FROM resumen_clientes WHERE monto_total > rc.monto_total) + 1 AS ranking,
-        ROUND(monto_total / (SELECT AVG(monto_total) FROM resumen_clientes) * 100, 1) AS porcentaje_del_promedio
+        (SELECT COUNT(*) FROM resumen_clientes WHERE monto_total > rc.monto_total) + 1 AS ranking
       FROM resumen_clientes rc
-      ORDER BY monto_total DESC
+      ORDER BY ranking
     `);
     res.json(rows);
   } catch (err) {
