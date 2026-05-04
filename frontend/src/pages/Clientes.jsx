@@ -1,4 +1,3 @@
-// src/pages/Clientes.jsx
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import Modal from '../components/ui/Modal'
