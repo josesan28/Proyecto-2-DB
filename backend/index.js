@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db/pool");
+const requireAuth = require("./middleware/auth");
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,7 @@ app.get("/api/ping", async (req, res) => {
   }
 });
 
+app.use("/api/auth", require("./routes/auth"));
 app.use("/api/categorias", require("./routes/categorias"));
 app.use("/api/productos", require("./routes/productos"));
 app.use("/api/clientes", require("./routes/clientes"));
