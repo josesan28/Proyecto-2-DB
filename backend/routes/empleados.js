@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db/pool");
+const bcrypt = require("bcrypt");
 
 // GET /api/empleados
 router.get("/", async (req, res) => {
@@ -89,6 +90,14 @@ router.post("/", async (req, res) => {
       );
     }
 
+  if (req.body.contrasena) {
+    const hash = await bcrypt.hash(req.body.contrasena, 10);
+    await conn.query(
+      "UPDATE empleado SET hash_contrasena = ? WHERE id_empleado = ?",
+      [hash, id_empleado]
+    );
+  }
+
     await conn.commit();
     res.status(201).json({ id_empleado, message: "Empleado creado" });
   } catch (err) {
@@ -144,6 +153,14 @@ router.put("/:id", async (req, res) => {
         [req.params.id, correo]
       );
     }
+  
+    if (req.body.contrasena) {
+      const hash = await bcrypt.hash(req.body.contrasena, 10);
+      await conn.query(
+        "UPDATE empleado SET hash_contrasena = ? WHERE id_empleado = ?",
+        [hash, req.params.id]
+      );
+    }
 
     await conn.commit();
     res.json({ message: "Empleado actualizado" });
@@ -171,6 +188,25 @@ router.delete("/:id", async (req, res) => {
     if (err.code === "ER_ROW_IS_REFERENCED_2") {
       return res.status(409).json({ error: "No se puede eliminar: el empleado tiene ventas registradas" });
     }
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT /api/empleados/:id/contrasena
+router.put("/:id/contrasena", async (req, res) => {
+  const { contrasena } = req.body;
+  if (!contrasena || contrasena.length < 4)
+    return res.status(400).json({ error: "La contraseña debe tener al menos 4 caracteres" });
+
+  try {
+    const hash = await bcrypt.hash(contrasena, 10);
+    const [result] = await pool.query(
+      "UPDATE empleado SET hash_contrasena = ? WHERE id_empleado = ?",
+      [hash, req.params.id]
+    );
+    if (!result.affectedRows) return res.status(404).json({ error: "Empleado no encontrado" });
+    res.json({ message: "Contraseña actualizada" });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

@@ -59,7 +59,7 @@ INSERT INTO correo_proveedor (id_proveedor, correo) VALUES
 
 -- EMPLEADOS
 INSERT INTO empleado (nombre_empleado, username, hash_contrasena, cargo, fecha_contratacion, estado) VALUES
-('Carlos Mendoza Pérez',    'carlos.mendoza',  '$2b$12$abc1234567890ABCDEFGHIJ', 'Gerente General',    '2018-03-15', 'activo'),
+('José Sanchez',    'josesan',  '$2a$10$ZLSNHefmGewDJdzLSWNRG.ZIOGBuvJKjAaZgrQ5oGYngDWiP9AvSS', 'Vendedor', '2018-03-15', 'activo'),
 ('Ana Lucía Rodríguez',     'ana.rodriguez',   '$2b$12$def1234567890ABCDEFGHIJ', 'Jefe de Ventas',     '2019-07-01', 'activo'),
 ('Diego Fuentes López',     'diego.fuentes',   '$2b$12$ghi1234567890ABCDEFGHIJ', 'Vendedor',           '2020-01-10', 'activo'),
 ('María José García',       'maria.garcia',    '$2b$12$jkl1234567890ABCDEFGHIJ', 'Vendedora',          '2020-06-20', 'activo'),
@@ -68,7 +68,7 @@ INSERT INTO empleado (nombre_empleado, username, hash_contrasena, cargo, fecha_c
 ('Roberto Castillo Vega',   'roberto.castillo','$2b$12$stu1234567890ABCDEFGHIJ', 'Bodeguero',          '2022-04-18', 'activo'),
 ('Gabriela Morales Soto',   'gabriela.morales','$2b$12$vwx1234567890ABCDEFGHIJ', 'Atención al Cliente','2022-11-07', 'activo'),
 ('José Ramírez Aguilar',    'jose.ramirez',    '$2b$12$yza1234567890ABCDEFGHIJ', 'Vendedor',           '2023-05-22', 'activo'),
-('Valeria Ortiz Chan',      'valeria.ortiz',   '$2b$12$yzb1234567890ABCDEFGHIJ', 'Asistente',          '2024-01-08', 'inactivo');
+('Valeria Ortiz Chan',      'valeria.ortiz',   '$2b$12$yzb1234567890ABCDEFGHIJ', 'Asistente',          '2024-01-08', 'activo');
 
 -- Teléfonos de empleados
 INSERT INTO telefono_empleado (id_empleado, telefono) VALUES
@@ -77,7 +77,7 @@ INSERT INTO telefono_empleado (id_empleado, telefono) VALUES
 
 -- Correos de empleados
 INSERT INTO correo_empleado (id_empleado, correo) VALUES
-(1,'carlos.mendoza@tienda.com'),
+(1,'josesan@tienda.com'),
 (2,'ana.rodriguez@tienda.com'),
 (3,'diego.fuentes@tienda.com'),
 (4,'maria.garcia@tienda.com'),
@@ -89,7 +89,7 @@ INSERT INTO correo_empleado (id_empleado, correo) VALUES
 (10,'valeria.ortiz@tienda.com');
 
 
--- CLIENTES 
+-- Clientes
 INSERT INTO cliente (nombre_cliente, observaciones) VALUES
 ('Juan Pablo Alvarado',     'Cliente frecuente, prefiere pago en efectivo'),
 ('Sandra Patricia Lima',    NULL),

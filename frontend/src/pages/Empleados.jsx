@@ -7,6 +7,7 @@ import './CrudPage.css'
 const empty = {
   nombre_empleado: '', username: '', cargo: '',
   fecha_contratacion: '', estado: 'activo', telefonos: [''], correos: [''],
+  contrasena: '',
 }
 
 export default function Empleados() {
@@ -38,6 +39,7 @@ export default function Empleados() {
       estado: item.estado,
       telefonos: item.telefonos.length ? item.telefonos : [''],
       correos: item.correos.length ? item.correos : [''],
+      contrasena: '',
     })
     setEditId(item.id_empleado)
     setModal('form')
@@ -51,6 +53,7 @@ export default function Empleados() {
       correos: form.correos.filter(c => c.trim()),
       fecha_contratacion: form.fecha_contratacion || null,
       username: form.username || null,
+      contrasena: form.contrasena || null,
     }
     try {
       if (editId) {
@@ -160,6 +163,15 @@ export default function Empleados() {
               <label>Fecha contratación</label>
               <input type="date" value={form.fecha_contratacion}
                 onChange={e => f('fecha_contratacion', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>{editId ? 'Nueva contraseña (dejar vacío para no cambiar)' : 'Contraseña'}</label>
+              <input
+                type="password"
+                value={form.contrasena}
+                onChange={e => f('contrasena', e.target.value)}
+                placeholder={editId ? 'Sin cambios' : 'Mínimo 4 caracteres'}
+              />
             </div>
             <div className="form-group">
               <label>Estado</label>
