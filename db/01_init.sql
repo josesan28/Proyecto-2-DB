@@ -7,6 +7,8 @@ CREATE DATABASE IF NOT EXISTS tienda_db
     COLLATE utf8mb4_unicode_ci;
 
 USE tienda_db;
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
 
 -- Categoría
 CREATE TABLE categoria (

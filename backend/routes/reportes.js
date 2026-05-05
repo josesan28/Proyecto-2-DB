@@ -126,7 +126,7 @@ router.get("/empleados-sobre-promedio-cargo", async (req, res) => {
   }
 });
 
-// VIEW: Resumen de ventas por categoria
+// VIEW: Resumen de ventas por categoría
 // GET /api/reportes/ventas-por-categoria
 router.get("/ventas-por-categoria", async (req, res) => {
   try {

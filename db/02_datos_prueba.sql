@@ -1,6 +1,8 @@
 --  Proyecto 2 - Script de datos de prueba
 
 USE tienda_db;
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
 
 -- CATEGORÍAS
 INSERT INTO categoria (nombre_categoria, descripcion_categoria) VALUES

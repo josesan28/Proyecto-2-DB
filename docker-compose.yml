@@ -8,9 +8,11 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - db_data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./db/01_init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - ./db/02_datos_prueba.sql:/docker-entrypoint-initdb.d/02_datos_prueba.sql:ro
     ports:
       - "3306:3306"
     healthcheck:
