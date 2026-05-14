@@ -2,13 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db/pool");
-const requireAuth = require("./middleware/auth");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-app.locals.db = pool;
 
 app.get("/api/ping", async (req, res) => {
   try {
@@ -26,7 +23,6 @@ app.use("/api/clientes", require("./routes/clientes"));
 app.use("/api/proveedores", require("./routes/proveedores"));
 app.use("/api/empleados", require("./routes/empleados"));
 app.use("/api/ventas", require("./routes/ventas"));
-
 app.use("/api/reportes", require("./routes/reportes"));
 
 app.use((req, res) => {
