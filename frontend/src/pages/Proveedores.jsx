@@ -1,17 +1,17 @@
 import { useEffect, useState, useCallback } from 'react'
 import { api } from '../api'
-import Modal from '../components/ui/Modal'
+import ProveedorFormModal from '../components/proveedores/ProveedorFormModal'
+import ProveedoresTable from '../components/proveedores/ProveedoresTable'
+import { emptyProveedorForm } from '../components/proveedores/proveedorForm'
 import { useToast } from '../components/ui/Toast'
 import './CrudPage.css'
-
-const empty = { nombre_proveedor: '', direccion_proveedor: '', telefonos: [''], correos: [''] }
 
 export default function Proveedores() {
   const toast = useToast()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState(empty)
+  const [form, setForm] = useState(emptyProveedorForm)
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
 
@@ -25,7 +25,7 @@ export default function Proveedores() {
 
   useEffect(() => { load() }, [load])
 
-  const openCreate = () => { setForm(empty); setEditId(null); setModal('form') }
+  const openCreate = () => { setForm(emptyProveedorForm); setEditId(null); setModal('form') }
   const openEdit = item => {
     setForm({
       nombre_proveedor: item.nombre_proveedor,
@@ -88,75 +88,20 @@ export default function Proveedores() {
           <input placeholder="Buscar proveedor…" value={search}
             onChange={e => setSearch(e.target.value)} style={{ maxWidth: 280 }} />
         </div>
-        {loading ? <div className="spinner" /> : filtered.length === 0 ? (
-          <div className="empty-state"><p>No hay proveedores.</p></div>
-        ) : (
-          <table>
-            <thead>
-              <tr><th>Nombre</th><th>Dirección</th><th>Teléfonos</th><th>Correos</th><th></th></tr>
-            </thead>
-            <tbody>
-              {filtered.map(p => (
-                <tr key={p.id_proveedor}>
-                  <td>{p.nombre_proveedor}</td>
-                  <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{p.direccion_proveedor || '—'}</td>
-                  <td>{p.telefonos.join(', ') || '—'}</td>
-                  <td>{p.correos.join(', ') || '—'}</td>
-                  <td className="actions">
-                    <button className="btn-secondary btn-sm" onClick={() => openEdit(p)}>Editar</button>
-                    <button className="btn-danger btn-sm" onClick={() => handleDelete(p.id_proveedor)}>Eliminar</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <ProveedoresTable loading={loading} items={filtered} onEdit={openEdit} onDelete={handleDelete} />
       </div>
 
       {modal === 'form' && (
-        <Modal
-          title={editId ? 'Editar proveedor' : 'Nuevo proveedor'}
+        <ProveedorFormModal
+          editId={editId}
+          form={form}
+          setForm={setForm}
+          setArr={setArr}
+          addArr={addArr}
+          delArr={delArr}
           onClose={() => setModal(null)}
-          footer={<>
-            <button className="btn-secondary" onClick={() => setModal(null)}>Cancelar</button>
-            <button className="btn-primary" onClick={handleSubmit}>
-              {editId ? 'Guardar cambios' : 'Crear proveedor'}
-            </button>
-          </>}
-        >
-          <div className="form-group">
-            <label>Nombre *</label>
-            <input value={form.nombre_proveedor}
-              onChange={e => setForm(p => ({ ...p, nombre_proveedor: e.target.value }))} />
-          </div>
-          <div className="form-group">
-            <label>Dirección</label>
-            <input value={form.direccion_proveedor}
-              onChange={e => setForm(p => ({ ...p, direccion_proveedor: e.target.value }))} />
-          </div>
-          <div className="form-group">
-            <label>Teléfonos</label>
-            {form.telefonos.map((t, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-                <input value={t} onChange={e => setArr('telefonos', i, e.target.value)} />
-                {form.telefonos.length > 1 &&
-                  <button className="btn-danger btn-sm" onClick={() => delArr('telefonos', i)}>×</button>}
-              </div>
-            ))}
-            <button className="btn-secondary btn-sm" onClick={() => addArr('telefonos')}>+ Teléfono</button>
-          </div>
-          <div className="form-group">
-            <label>Correos</label>
-            {form.correos.map((c, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-                <input type="email" value={c} onChange={e => setArr('correos', i, e.target.value)} />
-                {form.correos.length > 1 &&
-                  <button className="btn-danger btn-sm" onClick={() => delArr('correos', i)}>×</button>}
-              </div>
-            ))}
-            <button className="btn-secondary btn-sm" onClick={() => addArr('correos')}>+ Correo</button>
-          </div>
-        </Modal>
+          onSubmit={handleSubmit}
+        />
       )}
     </div>
   )

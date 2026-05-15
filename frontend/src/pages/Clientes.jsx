@@ -1,17 +1,17 @@
 import { useEffect, useState, useCallback } from 'react'
 import { api } from '../api'
-import Modal from '../components/ui/Modal'
+import ClienteFormModal from '../components/clientes/ClienteFormModal'
+import ClientesTable from '../components/clientes/ClientesTable'
+import { emptyClienteForm } from '../components/clientes/clienteForm'
 import { useToast } from '../components/ui/Toast'
 import './CrudPage.css'
-
-const empty = { nombre_cliente: '', observaciones: '', telefonos: [''], correos: [''] }
 
 export default function Clientes() {
   const toast = useToast()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState(empty)
+  const [form, setForm] = useState(emptyClienteForm)
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
 
@@ -25,7 +25,7 @@ export default function Clientes() {
 
   useEffect(() => { load() }, [load])
 
-  const openCreate = () => { setForm(empty); setEditId(null); setModal('form') }
+  const openCreate = () => { setForm(emptyClienteForm); setEditId(null); setModal('form') }
   const openEdit = item => {
     setForm({
       nombre_cliente: item.nombre_cliente,
@@ -88,76 +88,20 @@ export default function Clientes() {
           <input placeholder="Buscar cliente…" value={search}
             onChange={e => setSearch(e.target.value)} style={{ maxWidth: 280 }} />
         </div>
-        {loading ? <div className="spinner" /> : filtered.length === 0 ? (
-          <div className="empty-state"><p>No hay clientes.</p></div>
-        ) : (
-          <table>
-            <thead>
-              <tr><th>Nombre</th><th>Teléfonos</th><th>Correos</th><th>Observaciones</th><th></th></tr>
-            </thead>
-            <tbody>
-              {filtered.map(c => (
-                <tr key={c.id_cliente}>
-                  <td>{c.nombre_cliente}</td>
-                  <td>{c.telefonos.join(', ') || '—'}</td>
-                  <td>{c.correos.join(', ') || '—'}</td>
-                  <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{c.observaciones || '—'}</td>
-                  <td className="actions">
-                    <button className="btn-secondary btn-sm" onClick={() => openEdit(c)}>Editar</button>
-                    <button className="btn-danger btn-sm" onClick={() => handleDelete(c.id_cliente)}>Eliminar</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <ClientesTable loading={loading} items={filtered} onEdit={openEdit} onDelete={handleDelete} />
       </div>
 
       {modal === 'form' && (
-        <Modal
-          title={editId ? 'Editar cliente' : 'Nuevo cliente'}
+        <ClienteFormModal
+          editId={editId}
+          form={form}
+          setForm={setForm}
+          setArr={setArr}
+          addArr={addArr}
+          delArr={delArr}
           onClose={() => setModal(null)}
-          footer={<>
-            <button className="btn-secondary" onClick={() => setModal(null)}>Cancelar</button>
-            <button className="btn-primary" onClick={handleSubmit}>
-              {editId ? 'Guardar cambios' : 'Crear cliente'}
-            </button>
-          </>}
-        >
-          <div className="form-group">
-            <label>Nombre *</label>
-            <input value={form.nombre_cliente}
-              onChange={e => setForm(p => ({ ...p, nombre_cliente: e.target.value }))} />
-          </div>
-          <div className="form-group">
-            <label>Observaciones</label>
-            <textarea rows={2} value={form.observaciones}
-              onChange={e => setForm(p => ({ ...p, observaciones: e.target.value }))}
-              style={{ resize: 'vertical' }} />
-          </div>
-          <div className="form-group">
-            <label>Teléfonos</label>
-            {form.telefonos.map((t, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-                <input value={t} onChange={e => setArr('telefonos', i, e.target.value)} />
-                {form.telefonos.length > 1 &&
-                  <button className="btn-danger btn-sm" onClick={() => delArr('telefonos', i)}>×</button>}
-              </div>
-            ))}
-            <button className="btn-secondary btn-sm" onClick={() => addArr('telefonos')}>+ Teléfono</button>
-          </div>
-          <div className="form-group">
-            <label>Correos</label>
-            {form.correos.map((c, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-                <input type="email" value={c} onChange={e => setArr('correos', i, e.target.value)} />
-                {form.correos.length > 1 &&
-                  <button className="btn-danger btn-sm" onClick={() => delArr('correos', i)}>×</button>}
-              </div>
-            ))}
-            <button className="btn-secondary btn-sm" onClick={() => addArr('correos')}>+ Correo</button>
-          </div>
-        </Modal>
+          onSubmit={handleSubmit}
+        />
       )}
     </div>
   )
