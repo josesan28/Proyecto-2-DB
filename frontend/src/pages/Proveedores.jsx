@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { api } from '../api'
 import Modal from '../components/ui/Modal'
 import { useToast } from '../components/ui/Toast'
@@ -15,15 +15,15 @@ export default function Proveedores() {
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true)
     api.get('/api/proveedores')
       .then(setItems)
       .catch(e => toast(e.message, 'error'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
-  useEffect(load, [])
+  useEffect(() => { load() }, [load])
 
   const openCreate = () => { setForm(empty); setEditId(null); setModal('form') }
   const openEdit = item => {
@@ -31,7 +31,7 @@ export default function Proveedores() {
       nombre_proveedor: item.nombre_proveedor,
       direccion_proveedor: item.direccion_proveedor || '',
       telefonos: item.telefonos.length ? item.telefonos : [''],
-      correos: item.correos.length ? item.correos   : [''],
+      correos: item.correos.length ? item.correos : [''],
     })
     setEditId(item.id_proveedor)
     setModal('form')
@@ -101,7 +101,7 @@ export default function Proveedores() {
                   <td>{p.nombre_proveedor}</td>
                   <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{p.direccion_proveedor || '—'}</td>
                   <td>{p.telefonos.join(', ') || '—'}</td>
-                  <td>{p.correos.join(', ')   || '—'}</td>
+                  <td>{p.correos.join(', ') || '—'}</td>
                   <td className="actions">
                     <button className="btn-secondary btn-sm" onClick={() => openEdit(p)}>Editar</button>
                     <button className="btn-danger btn-sm" onClick={() => handleDelete(p.id_proveedor)}>Eliminar</button>

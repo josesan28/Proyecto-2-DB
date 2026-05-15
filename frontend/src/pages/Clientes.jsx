@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { api } from '../api'
 import Modal from '../components/ui/Modal'
 import { useToast } from '../components/ui/Toast'
@@ -15,15 +15,15 @@ export default function Clientes() {
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true)
     api.get('/api/clientes')
       .then(setItems)
       .catch(e => toast(e.message, 'error'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
-  useEffect(load, [])
+  useEffect(() => { load() }, [load])
 
   const openCreate = () => { setForm(empty); setEditId(null); setModal('form') }
   const openEdit = item => {
@@ -100,7 +100,7 @@ export default function Clientes() {
                 <tr key={c.id_cliente}>
                   <td>{c.nombre_cliente}</td>
                   <td>{c.telefonos.join(', ') || '—'}</td>
-                  <td>{c.correos.join(', ')   || '—'}</td>
+                  <td>{c.correos.join(', ') || '—'}</td>
                   <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{c.observaciones || '—'}</td>
                   <td className="actions">
                     <button className="btn-secondary btn-sm" onClick={() => openEdit(c)}>Editar</button>
@@ -135,7 +135,6 @@ export default function Clientes() {
               onChange={e => setForm(p => ({ ...p, observaciones: e.target.value }))}
               style={{ resize: 'vertical' }} />
           </div>
-
           <div className="form-group">
             <label>Teléfonos</label>
             {form.telefonos.map((t, i) => (
@@ -147,7 +146,6 @@ export default function Clientes() {
             ))}
             <button className="btn-secondary btn-sm" onClick={() => addArr('telefonos')}>+ Teléfono</button>
           </div>
-
           <div className="form-group">
             <label>Correos</label>
             {form.correos.map((c, i) => (

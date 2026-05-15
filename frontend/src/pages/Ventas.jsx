@@ -1,9 +1,39 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useReducer, useCallback } from 'react'
 import { api } from '../api'
 import Modal from '../components/ui/Modal'
 import { useToast } from '../components/ui/Toast'
 import './Ventas.css'
 import './CrudPage.css'
+
+// Reducer para el formulario de nueva venta
+const initialForm = {
+  id_empleado: '',
+  id_cliente: '',
+  items: [{ id_producto: '', cantidad: 1 }],
+}
+
+function ventaReducer(state, action) {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value }
+    case 'SET_ITEM':
+      return {
+        ...state,
+        items: state.items.map((it, i) =>
+          i === action.index ? { ...it, [action.field]: action.value } : it
+        ),
+      }
+    case 'ADD_ITEM':
+      return { ...state, items: [...state.items, { id_producto: '', cantidad: 1 }] }
+    case 'REMOVE_ITEM':
+      return { ...state, items: state.items.filter((_, i) => i !== action.index) }
+    case 'RESET':
+      return initialForm
+    default:
+      return state
+  }
+}
+
 
 export default function Ventas() {
   const toast = useToast()
@@ -15,10 +45,9 @@ export default function Ventas() {
   const [modal, setModal] = useState(null)
   const [detalle, setDetalle] = useState(null)
 
-  const [form, setForm] = useState({ id_empleado: '', id_cliente: '' })
-  const [items, setItems] = useState([{ id_producto: '', cantidad: 1 }])
+  const [form, dispatch] = useReducer(ventaReducer, initialForm)
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true)
     Promise.all([
       api.get('/api/ventas'),
@@ -29,36 +58,33 @@ export default function Ventas() {
       setVentas(v); setProductos(p); setEmpleados(e); setClientes(c)
     }).catch(e => toast(e.message, 'error'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
-  useEffect(load, [])
+  useEffect(() => { load() }, [load])
 
-  const addItem = () => setItems(i => [...i, { id_producto: '', cantidad: 1 }])
-  const delItem = idx => setItems(i => i.filter((_, j) => j !== idx))
-  const setItem = (idx, k, v) => setItems(i => {
-    const arr = [...i]; arr[idx] = { ...arr[idx], [k]: v }; return arr
-  })
-
-  const calcTotal = () => items.reduce((sum, it) => {
-    const prod = productos.find(p => p.id_producto === parseInt(it.id_producto))
-    return sum + (prod ? prod.precio_venta * (parseInt(it.cantidad) || 0) : 0)
-  }, 0)
+  const calcTotal = () =>
+    form.items.reduce((sum, it) => {
+      const prod = productos.find(p => p.id_producto === parseInt(it.id_producto))
+      return sum + (prod ? prod.precio_venta * (parseInt(it.cantidad) || 0) : 0)
+    }, 0)
 
   const handleSubmit = async () => {
     if (!form.id_empleado) { toast('Selecciona un empleado', 'warning'); return }
-    if (items.some(i => !i.id_producto || !i.cantidad || i.cantidad < 1)) {
+    if (form.items.some(i => !i.id_producto || !i.cantidad || i.cantidad < 1)) {
       toast('Completa todos los productos de la venta', 'warning'); return
     }
     try {
       await api.post('/api/ventas', {
         id_empleado: parseInt(form.id_empleado),
-        id_cliente:  form.id_cliente ? parseInt(form.id_cliente) : null,
-        items: items.map(i => ({ id_producto: parseInt(i.id_producto), cantidad: parseInt(i.cantidad) })),
+        id_cliente: form.id_cliente ? parseInt(form.id_cliente) : null,
+        items: form.items.map(i => ({
+          id_producto: parseInt(i.id_producto),
+          cantidad: parseInt(i.cantidad),
+        })),
       })
       toast('Venta registrada correctamente')
       setModal(null)
-      setForm({ id_empleado: '', id_cliente: '' })
-      setItems([{ id_producto: '', cantidad: 1 }])
+      dispatch({ type: 'RESET' })
       load()
     } catch (e) { toast(e.message, 'error') }
   }
@@ -73,8 +99,7 @@ export default function Ventas() {
 
   const verDetalle = async id => {
     try {
-      const d = await api.get(`/api/ventas/${id}`)
-      setDetalle(d)
+      setDetalle(await api.get(`/api/ventas/${id}`))
     } catch (e) { toast(e.message, 'error') }
   }
 
@@ -112,20 +137,22 @@ export default function Ventas() {
         )}
       </div>
 
-      {/* Modal nueva venta */}
       {modal === 'form' && (
         <Modal
           title="Nueva venta"
-          onClose={() => setModal(null)}
+          onClose={() => { setModal(null); dispatch({ type: 'RESET' }) }}
           footer={<>
-            <button className="btn-secondary" onClick={() => setModal(null)}>Cancelar</button>
+            <button className="btn-secondary" onClick={() => { setModal(null); dispatch({ type: 'RESET' }) }}>Cancelar</button>
             <button className="btn-primary" onClick={handleSubmit}>Registrar venta</button>
           </>}
         >
           <div className="form-row">
             <div className="form-group">
               <label>Empleado *</label>
-              <select value={form.id_empleado} onChange={e => setForm(p => ({ ...p, id_empleado: e.target.value }))}>
+              <select
+                value={form.id_empleado}
+                onChange={e => dispatch({ type: 'SET_FIELD', field: 'id_empleado', value: e.target.value })}
+              >
                 <option value="">Seleccionar…</option>
                 {empleados.filter(e => e.estado === 'activo').map(e => (
                   <option key={e.id_empleado} value={e.id_empleado}>{e.nombre_empleado}</option>
@@ -134,7 +161,10 @@ export default function Ventas() {
             </div>
             <div className="form-group">
               <label>Cliente (opcional)</label>
-              <select value={form.id_cliente} onChange={e => setForm(p => ({ ...p, id_cliente: e.target.value }))}>
+              <select
+                value={form.id_cliente}
+                onChange={e => dispatch({ type: 'SET_FIELD', field: 'id_cliente', value: e.target.value })}
+              >
                 <option value="">Consumidor final</option>
                 {clientes.map(c => (
                   <option key={c.id_cliente} value={c.id_cliente}>{c.nombre_cliente}</option>
@@ -145,12 +175,14 @@ export default function Ventas() {
 
           <div className="form-group">
             <label>Productos</label>
-            {items.map((it, i) => {
+            {form.items.map((it, i) => {
               const prod = productos.find(p => p.id_producto === parseInt(it.id_producto))
               return (
                 <div key={i} className="item-row">
-                  <select value={it.id_producto} onChange={e => setItem(i, 'id_producto', e.target.value)}
-                    style={{ flex: 2 }}>
+                  <select
+                    value={it.id_producto}
+                    onChange={e => dispatch({ type: 'SET_ITEM', index: i, field: 'id_producto', value: e.target.value })}
+                  >
                     <option value="">Seleccionar producto…</option>
                     {productos.map(p => (
                       <option key={p.id_producto} value={p.id_producto}>
@@ -158,18 +190,22 @@ export default function Ventas() {
                       </option>
                     ))}
                   </select>
-                  <input type="number" min="1" value={it.cantidad}
-                    onChange={e => setItem(i, 'cantidad', e.target.value)}
-                    style={{ width: 70 }} />
+                  <input
+                    type="number" min="1"
+                    value={it.cantidad}
+                    onChange={e => dispatch({ type: 'SET_ITEM', index: i, field: 'cantidad', value: e.target.value })}
+                    style={{ width: 70 }}
+                  />
                   <span className="item-subtotal">
                     {prod ? `Q ${(prod.precio_venta * (parseInt(it.cantidad) || 0)).toFixed(2)}` : '—'}
                   </span>
-                  {items.length > 1 &&
-                    <button className="btn-danger btn-sm" onClick={() => delItem(i)}>×</button>}
+                  {form.items.length > 1 && (
+                    <button className="btn-danger btn-sm" onClick={() => dispatch({ type: 'REMOVE_ITEM', index: i })}>×</button>
+                  )}
                 </div>
               )
             })}
-            <button className="btn-secondary btn-sm" onClick={addItem} style={{ marginTop: 6 }}>
+            <button className="btn-secondary btn-sm" style={{ marginTop: 6 }} onClick={() => dispatch({ type: 'ADD_ITEM' })}>
               + Agregar producto
             </button>
           </div>
@@ -180,7 +216,6 @@ export default function Ventas() {
         </Modal>
       )}
 
-      {/* Modal detalle de venta */}
       {detalle && (
         <Modal title={`Detalle de venta #${detalle.id_venta}`} onClose={() => setDetalle(null)}>
           <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 12 }}>

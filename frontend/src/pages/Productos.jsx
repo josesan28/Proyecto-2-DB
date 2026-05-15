@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { api } from '../api'
 import Modal from '../components/ui/Modal'
 import { useToast } from '../components/ui/Toast'
@@ -20,7 +20,7 @@ export default function Productos() {
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true)
     Promise.all([
       api.get('/api/productos'),
@@ -30,9 +30,9 @@ export default function Productos() {
       setItems(p); setCategorias(c); setProveedores(pr)
     }).catch(e => toast(e.message, 'error'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
-  useEffect(load, [])
+  useEffect(() => { load() }, [load])
 
   const openCreate = () => { setForm(empty); setEditId(null); setModal('form') }
   const openEdit = item => {
@@ -70,8 +70,7 @@ export default function Productos() {
     if (!confirm('¿Eliminar este producto?')) return
     try {
       await api.delete(`/api/productos/${id}`)
-      toast('Producto eliminado')
-      load()
+      toast('Producto eliminado'); load()
     } catch (e) { toast(e.message, 'error') }
   }
 
@@ -94,16 +93,12 @@ export default function Productos() {
           <input placeholder="Buscar producto o categoría…" value={search}
             onChange={e => setSearch(e.target.value)} style={{ maxWidth: 280 }} />
         </div>
-
         {loading ? <div className="spinner" /> : filtered.length === 0 ? (
           <div className="empty-state"><p>No hay productos.</p></div>
         ) : (
           <table>
             <thead>
-              <tr>
-                <th>Nombre</th><th>Categoría</th><th>Proveedor</th>
-                <th>P. venta</th><th>Stock</th><th></th>
-              </tr>
+              <tr><th>Nombre</th><th>Categoría</th><th>Proveedor</th><th>P. venta</th><th>Stock</th><th></th></tr>
             </thead>
             <tbody>
               {filtered.map(p => (

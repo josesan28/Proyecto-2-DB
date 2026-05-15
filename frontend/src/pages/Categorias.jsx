@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { api } from '../api'
 import Modal from '../components/ui/Modal'
 import { useToast } from '../components/ui/Toast'
@@ -14,15 +14,15 @@ export default function Categorias() {
   const [form, setForm] = useState(empty)
   const [editId, setEditId] = useState(null)
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true)
     api.get('/api/categorias')
       .then(setItems)
       .catch(e => toast(e.message, 'error'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
-  useEffect(load, [])
+  useEffect(() => { load() }, [load])
 
   const openCreate = () => { setForm(empty); setEditId(null); setModal('form') }
   const openEdit = item => {

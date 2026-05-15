@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { api } from '../api'
 import Modal from '../components/ui/Modal'
 import { useToast } from '../components/ui/Toast'
@@ -19,15 +19,15 @@ export default function Empleados() {
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true)
     api.get('/api/empleados')
       .then(setItems)
       .catch(e => toast(e.message, 'error'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
-  useEffect(load, [])
+  useEffect(() => { load() }, [load])
 
   const openCreate = () => { setForm(empty); setEditId(null); setModal('form') }
   const openEdit = item => {
@@ -166,12 +166,9 @@ export default function Empleados() {
             </div>
             <div className="form-group">
               <label>{editId ? 'Nueva contraseña (dejar vacío para no cambiar)' : 'Contraseña'}</label>
-              <input
-                type="password"
-                value={form.contrasena}
+              <input type="password" value={form.contrasena}
                 onChange={e => f('contrasena', e.target.value)}
-                placeholder={editId ? 'Sin cambios' : 'Mínimo 4 caracteres'}
-              />
+                placeholder={editId ? 'Sin cambios' : 'Mínimo 4 caracteres'} />
             </div>
             <div className="form-group">
               <label>Estado</label>
