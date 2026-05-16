@@ -1,10 +1,34 @@
 import { useState } from 'react'
 import { api } from '../api'
+import BarChart from '../components/ui/BarChart'
 import ReportesMenu from '../components/reportes/ReportesMenu'
 import ReportesResult from '../components/reportes/ReportesResult'
 import { REPORTES } from '../components/reportes/reportesConfig'
 import { useToast } from '../components/ui/Toast'
 import './Reportes.css'
+
+// Reportes con gráficas
+const CHART_CONFIG = {
+  'ventas-por-categoria': {
+    title: 'Ingresos por categoría (Q)',
+    getLabel: row => row.nombre_categoria,
+    getValue: row => parseFloat(row.ingresos_totales),
+    unit: 'Q ',
+  },
+  'ventas-por-empleado': {
+    title: 'Monto total vendido por empleado (Q)',
+    getLabel: row => row.nombre_empleado,
+    getValue: row => parseFloat(row.monto_total),
+    unit: 'Q ',
+  },
+  'productos-mas-vendidos': {
+    title: 'Unidades vendidas por producto (top 10)',
+    getLabel: row => row.nombre_producto,
+    getValue: row => parseInt(row.unidades_vendidas),
+    unit: '',
+    limit: 10,
+  },
+}
 
 export default function Reportes() {
   const toast = useToast()
@@ -38,6 +62,14 @@ export default function Reportes() {
   }
 
   const current = REPORTES.find(r => r.id === active)
+  const chartCfg = active ? CHART_CONFIG[active] : null
+
+  const chartData = chartCfg && data.length
+    ? (chartCfg.limit ? data.slice(0, chartCfg.limit) : data).map(row => ({
+        label: chartCfg.getLabel(row),
+        value: chartCfg.getValue(row),
+      }))
+    : null
 
   return (
     <div>
@@ -50,7 +82,22 @@ export default function Reportes() {
 
       <div className="reportes-layout">
         <ReportesMenu reportes={REPORTES} active={active} onSelect={cargar} />
-        <ReportesResult active={active} current={current} data={data} loading={loading} />
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {!loading && chartData && chartData.length > 0 && (
+            <div className="card" style={{ padding: '16px 20px' }}>
+              <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 12 }}>
+                {chartCfg.title}
+              </p>
+              <BarChart
+                data={chartData}
+                unit={chartCfg.unit}
+              />
+            </div>
+          )}
+
+          <ReportesResult active={active} current={current} data={data} loading={loading} />
+        </div>
       </div>
     </div>
   )
