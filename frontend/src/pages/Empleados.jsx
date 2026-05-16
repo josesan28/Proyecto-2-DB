@@ -4,10 +4,12 @@ import EmpleadoFormModal from '../components/empleados/EmpleadoFormModal'
 import EmpleadosTable from '../components/empleados/EmpleadosTable'
 import { emptyEmpleadoForm } from '../components/empleados/empleadoForm'
 import { useToast } from '../components/ui/Toast'
+import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
 
 export default function Empleados() {
   const toast = useToast()
+  const [confirm, ConfirmUI] = useConfirm()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
@@ -43,6 +45,17 @@ export default function Empleados() {
 
   const handleSubmit = async () => {
     if (!form.nombre_empleado) { toast('El nombre es obligatorio', 'warning'); return }
+
+    const isEdit = !!editId
+    const ok = await confirm({
+      title: isEdit ? 'Guardar cambios' : 'Crear empleado',
+      message: isEdit
+        ? `¿Guardar los cambios en "${form.nombre_empleado}"?`
+        : `¿Crear el empleado "${form.nombre_empleado}"?`,
+      danger: false,
+    })
+    if (!ok) return
+
     const payload = {
       ...form,
       telefonos: form.telefonos.filter(t => t.trim()),
@@ -52,7 +65,7 @@ export default function Empleados() {
       contrasena: form.contrasena || null,
     }
     try {
-      if (editId) {
+      if (isEdit) {
         await api.put(`/api/empleados/${editId}`, payload)
         toast('Empleado actualizado')
       } else {
@@ -63,8 +76,13 @@ export default function Empleados() {
     } catch (e) { toast(e.message, 'error') }
   }
 
-  const handleDelete = async id => {
-    if (!confirm('¿Eliminar este empleado?')) return
+  const handleDelete = async (id) => {
+    const item = items.find(e => e.id_empleado === id)
+    const ok = await confirm({
+      title: 'Eliminar empleado',
+      message: `¿Eliminar a "${item?.nombre_empleado}"? Esta acción no se puede deshacer.`,
+    })
+    if (!ok) return
     try {
       await api.delete(`/api/empleados/${id}`)
       toast('Empleado eliminado'); load()
@@ -112,6 +130,8 @@ export default function Empleados() {
           onSubmit={handleSubmit}
         />
       )}
+
+      {ConfirmUI}
     </div>
   )
 }

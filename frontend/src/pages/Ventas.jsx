@@ -1,6 +1,7 @@
 import { useEffect, useState, useReducer, useCallback } from 'react'
 import { api } from '../api'
 import { useToast } from '../components/ui/Toast'
+import { useConfirm } from '../hooks/useConfirm'
 import VentaDetalleModal from '../components/ventas/VentaDetalleModal'
 import VentaFormModal from '../components/ventas/VentaFormModal'
 import VentasTable from '../components/ventas/VentasTable'
@@ -10,6 +11,7 @@ import './CrudPage.css'
 
 export default function Ventas() {
   const toast = useToast()
+  const [confirm, ConfirmUI] = useConfirm()
   const [ventas, setVentas] = useState([])
   const [productos, setProductos] = useState([])
   const [empleados, setEmpleados] = useState([])
@@ -46,6 +48,15 @@ export default function Ventas() {
     if (form.items.some(i => !i.id_producto || !i.cantidad || i.cantidad < 1)) {
       toast('Completa todos los productos de la venta', 'warning'); return
     }
+
+    const total = calcTotal()
+    const ok = await confirm({
+      title: 'Registrar venta',
+      message: `¿Confirmar la venta por un total de Q ${total.toFixed(2)}?`,
+      danger: false,
+    })
+    if (!ok) return
+
     try {
       await api.post('/api/ventas', {
         id_empleado: parseInt(form.id_empleado),
@@ -62,8 +73,12 @@ export default function Ventas() {
     } catch (e) { toast(e.message, 'error') }
   }
 
-  const handleDelete = async id => {
-    if (!confirm('¿Anular esta venta? Se restaurará el stock.')) return
+  const handleDelete = async (id) => {
+    const ok = await confirm({
+      title: 'Anular venta',
+      message: `¿Anular la venta #${id}? El stock de los productos será restaurado.`,
+    })
+    if (!ok) return
     try {
       await api.delete(`/api/ventas/${id}`)
       toast('Venta anulada y stock restaurado'); load()
@@ -108,6 +123,8 @@ export default function Ventas() {
       {detalle && (
         <VentaDetalleModal detalle={detalle} onClose={() => setDetalle(null)} />
       )}
+
+      {ConfirmUI}
     </div>
   )
 }

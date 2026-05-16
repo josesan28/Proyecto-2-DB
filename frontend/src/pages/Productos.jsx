@@ -4,10 +4,12 @@ import ProductoFormModal from '../components/productos/ProductoFormModal'
 import ProductosTable from '../components/productos/ProductosTable'
 import { emptyProductoForm } from '../components/productos/productoForm'
 import { useToast } from '../components/ui/Toast'
+import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
 
 export default function Productos() {
   const toast = useToast()
+  const [confirm, ConfirmUI] = useConfirm()
   const [items, setItems] = useState([])
   const [categorias, setCategorias] = useState([])
   const [proveedores, setProveedores] = useState([])
@@ -51,8 +53,19 @@ export default function Productos() {
         || !form.id_categoria || !form.id_proveedor || !form.descripcion_producto) {
       toast('Completa todos los campos obligatorios', 'warning'); return
     }
+
+    const isEdit = !!editId
+    const ok = await confirm({
+      title: isEdit ? 'Guardar cambios' : 'Crear producto',
+      message: isEdit
+        ? `¿Guardar los cambios en "${form.nombre_producto}"?`
+        : `¿Crear el producto "${form.nombre_producto}"?`,
+      danger: false,
+    })
+    if (!ok) return
+
     try {
-      if (editId) {
+      if (isEdit) {
         await api.put(`/api/productos/${editId}`, form)
         toast('Producto actualizado')
       } else {
@@ -63,8 +76,13 @@ export default function Productos() {
     } catch (e) { toast(e.message, 'error') }
   }
 
-  const handleDelete = async id => {
-    if (!confirm('¿Eliminar este producto?')) return
+  const handleDelete = async (id) => {
+    const item = items.find(p => p.id_producto === id)
+    const ok = await confirm({
+      title: 'Eliminar producto',
+      message: `¿Eliminar "${item?.nombre_producto}"? Esta acción no se puede deshacer.`,
+    })
+    if (!ok) return
     try {
       await api.delete(`/api/productos/${id}`)
       toast('Producto eliminado'); load()
@@ -104,6 +122,8 @@ export default function Productos() {
           onSubmit={handleSubmit}
         />
       )}
+
+      {ConfirmUI}
     </div>
   )
 }

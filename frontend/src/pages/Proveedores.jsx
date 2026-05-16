@@ -4,10 +4,12 @@ import ProveedorFormModal from '../components/proveedores/ProveedorFormModal'
 import ProveedoresTable from '../components/proveedores/ProveedoresTable'
 import { emptyProveedorForm } from '../components/proveedores/proveedorForm'
 import { useToast } from '../components/ui/Toast'
+import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
 
 export default function Proveedores() {
   const toast = useToast()
+  const [confirm, ConfirmUI] = useConfirm()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
@@ -39,13 +41,24 @@ export default function Proveedores() {
 
   const handleSubmit = async () => {
     if (!form.nombre_proveedor) { toast('El nombre es obligatorio', 'warning'); return }
+
+    const isEdit = !!editId
+    const ok = await confirm({
+      title: isEdit ? 'Guardar cambios' : 'Crear proveedor',
+      message: isEdit
+        ? `¿Guardar los cambios en "${form.nombre_proveedor}"?`
+        : `¿Crear el proveedor "${form.nombre_proveedor}"?`,
+      danger: false,
+    })
+    if (!ok) return
+
     const payload = {
       ...form,
       telefonos: form.telefonos.filter(t => t.trim()),
       correos: form.correos.filter(c => c.trim()),
     }
     try {
-      if (editId) {
+      if (isEdit) {
         await api.put(`/api/proveedores/${editId}`, payload)
         toast('Proveedor actualizado')
       } else {
@@ -56,8 +69,13 @@ export default function Proveedores() {
     } catch (e) { toast(e.message, 'error') }
   }
 
-  const handleDelete = async id => {
-    if (!confirm('¿Eliminar este proveedor?')) return
+  const handleDelete = async (id) => {
+    const item = items.find(p => p.id_proveedor === id)
+    const ok = await confirm({
+      title: 'Eliminar proveedor',
+      message: `¿Eliminar a "${item?.nombre_proveedor}"? Esta acción no se puede deshacer.`,
+    })
+    if (!ok) return
     try {
       await api.delete(`/api/proveedores/${id}`)
       toast('Proveedor eliminado'); load()
@@ -103,6 +121,8 @@ export default function Proveedores() {
           onSubmit={handleSubmit}
         />
       )}
+
+      {ConfirmUI}
     </div>
   )
 }

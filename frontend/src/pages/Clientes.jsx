@@ -4,10 +4,12 @@ import ClienteFormModal from '../components/clientes/ClienteFormModal'
 import ClientesTable from '../components/clientes/ClientesTable'
 import { emptyClienteForm } from '../components/clientes/clienteForm'
 import { useToast } from '../components/ui/Toast'
+import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
 
 export default function Clientes() {
   const toast = useToast()
+  const [confirm, ConfirmUI] = useConfirm()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
@@ -39,13 +41,24 @@ export default function Clientes() {
 
   const handleSubmit = async () => {
     if (!form.nombre_cliente) { toast('El nombre es obligatorio', 'warning'); return }
+
+    const isEdit = !!editId
+    const ok = await confirm({
+      title: isEdit ? 'Guardar cambios' : 'Crear cliente',
+      message: isEdit
+        ? `¿Guardar los cambios en "${form.nombre_cliente}"?`
+        : `¿Crear el cliente "${form.nombre_cliente}"?`,
+      danger: false,
+    })
+    if (!ok) return
+
     const payload = {
       ...form,
       telefonos: form.telefonos.filter(t => t.trim()),
       correos: form.correos.filter(c => c.trim()),
     }
     try {
-      if (editId) {
+      if (isEdit) {
         await api.put(`/api/clientes/${editId}`, payload)
         toast('Cliente actualizado')
       } else {
@@ -56,8 +69,13 @@ export default function Clientes() {
     } catch (e) { toast(e.message, 'error') }
   }
 
-  const handleDelete = async id => {
-    if (!confirm('¿Eliminar este cliente?')) return
+  const handleDelete = async (id) => {
+    const item = items.find(c => c.id_cliente === id)
+    const ok = await confirm({
+      title: 'Eliminar cliente',
+      message: `¿Eliminar a "${item?.nombre_cliente}"? Esta acción no se puede deshacer.`,
+    })
+    if (!ok) return
     try {
       await api.delete(`/api/clientes/${id}`)
       toast('Cliente eliminado'); load()
@@ -103,6 +121,8 @@ export default function Clientes() {
           onSubmit={handleSubmit}
         />
       )}
+
+      {ConfirmUI}
     </div>
   )
 }

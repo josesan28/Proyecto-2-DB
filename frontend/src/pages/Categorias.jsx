@@ -4,10 +4,12 @@ import CategoriaFormModal from '../components/categorias/CategoriaFormModal'
 import CategoriasTable from '../components/categorias/CategoriasTable'
 import { emptyCategoriaForm } from '../components/categorias/categoriaForm'
 import { useToast } from '../components/ui/Toast'
+import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
 
 export default function Categorias() {
   const toast = useToast()
+  const [confirm, ConfirmUI] = useConfirm()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
@@ -33,8 +35,19 @@ export default function Categorias() {
 
   const handleSubmit = async () => {
     if (!form.nombre_categoria) { toast('El nombre es obligatorio', 'warning'); return }
+
+    const isEdit = !!editId
+    const ok = await confirm({
+      title: isEdit ? 'Guardar cambios' : 'Crear categoría',
+      message: isEdit
+        ? `¿Guardar los cambios en "${form.nombre_categoria}"?`
+        : `¿Crear la categoría "${form.nombre_categoria}"?`,
+      danger: false,
+    })
+    if (!ok) return
+
     try {
-      if (editId) {
+      if (isEdit) {
         await api.put(`/api/categorias/${editId}`, form)
         toast('Categoría actualizada')
       } else {
@@ -45,8 +58,13 @@ export default function Categorias() {
     } catch (e) { toast(e.message, 'error') }
   }
 
-  const handleDelete = async id => {
-    if (!confirm('¿Eliminar esta categoría?')) return
+  const handleDelete = async (id) => {
+    const item = items.find(c => c.id_categoria === id)
+    const ok = await confirm({
+      title: 'Eliminar categoría',
+      message: `¿Eliminar "${item?.nombre_categoria}"? Esta acción no se puede deshacer.`,
+    })
+    if (!ok) return
     try {
       await api.delete(`/api/categorias/${id}`)
       toast('Categoría eliminada'); load()
@@ -75,6 +93,8 @@ export default function Categorias() {
           onSubmit={handleSubmit}
         />
       )}
+
+      {ConfirmUI}
     </div>
   )
 }
