@@ -1,17 +1,17 @@
 import { useEffect, useState, useCallback } from 'react'
 import { api } from '../api'
-import Modal from '../components/ui/Modal'
+import CategoriaFormModal from '../components/categorias/CategoriaFormModal'
+import CategoriasTable from '../components/categorias/CategoriasTable'
+import { emptyCategoriaForm } from '../components/categorias/categoriaForm'
 import { useToast } from '../components/ui/Toast'
 import './CrudPage.css'
-
-const empty = { nombre_categoria: '', descripcion_categoria: '' }
 
 export default function Categorias() {
   const toast = useToast()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(null)
-  const [form, setForm] = useState(empty)
+  const [form, setForm] = useState(emptyCategoriaForm)
   const [editId, setEditId] = useState(null)
 
   const load = useCallback(() => {
@@ -24,7 +24,7 @@ export default function Categorias() {
 
   useEffect(() => { load() }, [load])
 
-  const openCreate = () => { setForm(empty); setEditId(null); setModal('form') }
+  const openCreate = () => { setForm(emptyCategoriaForm); setEditId(null); setModal('form') }
   const openEdit = item => {
     setForm({ nombre_categoria: item.nombre_categoria, descripcion_categoria: item.descripcion_categoria || '' })
     setEditId(item.id_categoria)
@@ -63,50 +63,17 @@ export default function Categorias() {
       </div>
 
       <div className="card">
-        {loading ? <div className="spinner" /> : items.length === 0 ? (
-          <div className="empty-state"><p>No hay categorías.</p></div>
-        ) : (
-          <table>
-            <thead>
-              <tr><th>Nombre</th><th>Descripción</th><th></th></tr>
-            </thead>
-            <tbody>
-              {items.map(c => (
-                <tr key={c.id_categoria}>
-                  <td>{c.nombre_categoria}</td>
-                  <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{c.descripcion_categoria || '—'}</td>
-                  <td className="actions">
-                    <button className="btn-secondary btn-sm" onClick={() => openEdit(c)}>Editar</button>
-                    <button className="btn-danger btn-sm" onClick={() => handleDelete(c.id_categoria)}>Eliminar</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <CategoriasTable loading={loading} items={items} onEdit={openEdit} onDelete={handleDelete} />
       </div>
 
       {modal === 'form' && (
-        <Modal
-          title={editId ? 'Editar categoría' : 'Nueva categoría'}
+        <CategoriaFormModal
+          editId={editId}
+          form={form}
+          onFieldChange={f}
           onClose={() => setModal(null)}
-          footer={<>
-            <button className="btn-secondary" onClick={() => setModal(null)}>Cancelar</button>
-            <button className="btn-primary" onClick={handleSubmit}>
-              {editId ? 'Guardar cambios' : 'Crear categoría'}
-            </button>
-          </>}
-        >
-          <div className="form-group">
-            <label>Nombre *</label>
-            <input value={form.nombre_categoria} onChange={e => f('nombre_categoria', e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label>Descripción</label>
-            <textarea rows={3} value={form.descripcion_categoria}
-              onChange={e => f('descripcion_categoria', e.target.value)} style={{ resize: 'vertical' }} />
-          </div>
-        </Modal>
+          onSubmit={handleSubmit}
+        />
       )}
     </div>
   )

@@ -1,19 +1,10 @@
 import { useState } from 'react'
 import { api } from '../api'
+import ReportesMenu from '../components/reportes/ReportesMenu'
+import ReportesResult from '../components/reportes/ReportesResult'
+import { REPORTES } from '../components/reportes/reportesConfig'
 import { useToast } from '../components/ui/Toast'
 import './Reportes.css'
-
-const REPORTES = [
-  { id: 'productos-detalle', label: 'Productos con categoría y proveedor' },
-  { id: 'ventas-completas', label: 'Ventas con empleado y cliente' },
-  { id: 'detalle-ventas', label: 'Información de detalles de ventas' },
-  { id: 'ventas-por-categoria', label: 'Ventas por categoría' },
-  { id: 'clientes-con-ventas', label: 'Clientes con compras registradas' },
-  { id: 'empleados-sobre-promedio-cargo', label: 'Empleados sobre promedio de su cargo' },
-  { id: 'ventas-por-empleado', label: 'Resumen de ventas por empleado' },
-  { id: 'productos-mas-vendidos', label: 'Productos más vendidos' },
-  { id: 'ranking-clientes', label: 'Ranking de clientes' },
-]
 
 export default function Reportes() {
   const toast = useToast()
@@ -46,7 +37,6 @@ export default function Reportes() {
     toast('CSV exportado')
   }
 
-  const cols = data.length ? Object.keys(data[0]) : []
   const current = REPORTES.find(r => r.id === active)
 
   return (
@@ -59,62 +49,8 @@ export default function Reportes() {
       </div>
 
       <div className="reportes-layout">
-        <div className="reportes-menu card">
-          {REPORTES.map(r => (
-            <button
-              key={r.id}
-              className={`reporte-btn ${active === r.id ? 'active' : ''}`}
-              onClick={() => cargar(r)}
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="reportes-result card">
-          {!active && (
-            <div className="empty-state">
-              <p>Selecciona un reporte del panel izquierdo.</p>
-            </div>
-          )}
-
-          {active && (
-            <div className="result-header">
-              <strong>{current?.label}</strong>
-              {data.length > 0 && (
-                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{data.length} filas</span>
-              )}
-            </div>
-          )}
-
-          {loading && <div className="spinner" />}
-
-          {!loading && data.length === 0 && active && (
-            <div className="empty-state"><p>Sin resultados.</p></div>
-          )}
-
-          {!loading && data.length > 0 && (
-            <div className="table-scroll">
-              <table>
-                <thead>
-                  <tr>{cols.map(c => <th key={c}>{c}</th>)}</tr>
-                </thead>
-                <tbody>
-                  {data.map((row, i) => (
-                    <tr key={i}>
-                      {cols.map(c => (
-                        <td key={c}>
-                          {row[c] === null ? <span style={{ color: 'var(--text-muted)' }}>null</span>
-                            : String(row[c])}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <ReportesMenu reportes={REPORTES} active={active} onSelect={cargar} />
+        <ReportesResult active={active} current={current} data={data} loading={loading} />
       </div>
     </div>
   )

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
+import DashboardStats from '../components/dashboard/DashboardStats'
+import { buildDashboardCards } from '../components/dashboard/dashboardCards'
 import { useToast } from '../components/ui/Toast'
 import './Dashboard.css'
 
@@ -28,13 +30,7 @@ export default function Dashboard() {
 
   if (!stats) return <div className="spinner" />
 
-  const cards = [
-    { label: 'Productos', value: stats.productos, note: `${stats.stockBajo} con stock bajo` },
-    { label: 'Clientes', value: stats.clientes, note: 'registrados' },
-    { label: 'Ventas', value: stats.ventas, note: 'realizadas' },
-    { label: 'Total vendido', value: `Q ${stats.totalVentas.toFixed(2)}`, note: 'acumulado' },
-    { label: 'Empleados', value: stats.empleados, note: 'activos' },
-  ]
+  const cards = buildDashboardCards(stats)
 
   return (
     <div>
@@ -44,15 +40,7 @@ export default function Dashboard() {
           <p>Resumen general de la tienda</p>
         </div>
       </div>
-      <div className="stat-grid">
-        {cards.map(c => (
-          <div key={c.label} className="card stat-card">
-            <div className="stat-value">{c.value}</div>
-            <div className="stat-label">{c.label}</div>
-            <div className="stat-note">{c.note}</div>
-          </div>
-        ))}
-      </div>
+      <DashboardStats cards={cards} />
     </div>
   )
 }
