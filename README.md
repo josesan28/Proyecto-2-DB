@@ -38,7 +38,7 @@ Ingresa estos datos en la pantalla de login para poder ingresar al sistema:
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <url-del-repositorio>
+git clone --branch proyecto-2-web --single-branch https://github.com/josesan28/Proyecto-2-DB.git
 cd proyecto-2-DB
 ```
 
@@ -103,7 +103,7 @@ docker compose --profile app down
 Para detener y eliminar los volúmenes principales:
 
 ```bash
-docker compose --profile app down
+docker compose --profile app down -v
 ```
 
 ---
@@ -221,7 +221,7 @@ Body de POST y PUT:
 
 ### Productos `/api/productos`
 
-| Metodo | Endpoint | Descripcion |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | GET | `/api/productos` | Listar todos |
 | GET | `/api/productos/:id` | Obtener uno |
@@ -245,7 +245,7 @@ Body de POST y PUT:
 
 ### Clientes `/api/clientes`
 
-| Metodo | Endpoint | Descripcion |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | GET | `/api/clientes` | Listar todos |
 | GET | `/api/clientes/:id` | Obtener uno |
@@ -266,7 +266,7 @@ Body de POST y PUT:
 
 ### Proveedores `/api/proveedores`
 
-| Metodo | Endpoint | Descripcion |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | GET | `/api/proveedores` | Listar todos |
 | GET | `/api/proveedores/:id` | Obtener uno |
@@ -287,7 +287,7 @@ Body de POST y PUT:
 
 ### Empleados `/api/empleados`
 
-| Metodo | Endpoint | Descripcion |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | GET | `/api/empleados` | Listar todos |
 | GET | `/api/empleados/:id` | Obtener uno |
@@ -313,7 +313,7 @@ Body de POST y PUT:
 
 ### Ventas `/api/ventas`
 
-| Metodo | Endpoint | Descripcion |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | GET | `/api/ventas` | Listar todas las ventas |
 | GET | `/api/ventas/:id` | Obtener una venta con su detalle |
@@ -353,7 +353,7 @@ Todos son `GET`, no requieren body y devuelven un array de objetos.
 
 ### Ping
 
-| Metodo | Endpoint | Descripción |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | GET | `/api/ping` | Verifica que el backend y la BD estén activos |
 
