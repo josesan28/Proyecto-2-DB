@@ -36,6 +36,7 @@
 .reportes-result {
   padding: 16px;
   min-height: 300px;
+  min-width: 0;
 }
 
 .result-header {
@@ -48,6 +49,12 @@
   font-size: 15px;
 }
 
-.table-scroll {
-  overflow-x: auto;
+.reportes-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+}
+
+.reportes-table-wrapper table {
+  width: max-content;
+  min-width: 100%;
 }

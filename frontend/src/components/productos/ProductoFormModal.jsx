@@ -9,6 +9,10 @@ export default function ProductoFormModal({
   onClose,
   onSubmit,
 }) {
+  const selectInputValue = (event) => {
+    event.target.select()
+  }
+
   return (
     <Modal
       title={editId ? 'Editar producto' : 'Nuevo producto'}
@@ -71,6 +75,8 @@ export default function ProductoFormModal({
         <label>Stock inicial</label>
         <input
           type="number" min="0" value={form.stock_actual}
+          onFocus={selectInputValue}
+          onClick={selectInputValue}
           onChange={e => onFieldChange('stock_actual', parseInt(e.target.value) || 0)}
         />
       </div>

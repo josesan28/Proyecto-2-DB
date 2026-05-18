@@ -150,6 +150,12 @@
 .badge-red    { background: #fde8e6; color: #c0392b; }
 .badge-yellow { background: #fef3d0; color: #9a6400; }
 
+/* Tablas responsivas */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Animaciones */
 @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

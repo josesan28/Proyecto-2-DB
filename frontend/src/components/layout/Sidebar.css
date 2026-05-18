@@ -1,11 +1,16 @@
 .sidebar {
   width: 240px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
   background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   padding: 24px 0;
   box-shadow: var(--shadow);
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .sidebar-brand {
@@ -15,6 +20,7 @@
   padding: 0 20px 24px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .brand-icon {
@@ -32,6 +38,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
 }
 
 .nav-link {
@@ -67,6 +74,7 @@
   margin-top: auto;
   padding: 16px 20px;
   border-top: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .sidebar-user {

@@ -25,7 +25,7 @@ export default function ReportesResult({ active, current, data, loading }) {
       )}
 
       {!loading && data.length > 0 && (
-        <div className="table-scroll">
+        <div className="table-wrapper reportes-table-wrapper">
           <table>
             <thead>
               <tr>{cols.map(c => <th key={c}>{c}</th>)}</tr>
@@ -35,7 +35,8 @@ export default function ReportesResult({ active, current, data, loading }) {
                 <tr key={i}>
                   {cols.map(c => (
                     <td key={c}>
-                      {row[c] === null ? <span style={{ color: 'var(--text-muted)' }}>null</span>
+                      {row[c] === null
+                        ? <span style={{ color: 'var(--text-muted)' }}>null</span>
                         : String(row[c])}
                     </td>
                   ))}
