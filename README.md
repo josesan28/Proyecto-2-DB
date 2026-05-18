@@ -38,8 +38,9 @@ Ingresa estos datos en la pantalla de login para poder ingresar al sistema:
 ### 1. Clonar el repositorio
 
 ```bash
-git clone --branch proyecto-2-web --single-branch https://github.com/josesan28/Proyecto-2-DB.git
-cd proyecto-2-DB
+git clone https://github.com/josesan28/Proyecto-2-DB.git
+cd Proyecto-2-DB
+git checkout proyecto-2-web
 ```
 
 ### 2. Crear el archivo de variables de entorno
