@@ -1,187 +1,402 @@
-# Proyecto 2 — Bases de Datos 1
+# Proyecto 2 - Sistemas y Tecnologías Web
 
-Aplicación web para gestionar el inventario y las ventas de una tienda.
-Incluye frontend en React, backend en Node.js/Express y base de datos MySQL,
-todo orquestado con Docker.
+## José Manuel Sanchez Hernández
+
+Aplicación web para gestionar el inventario y las ventas de una tienda con diferentes categorías. El frontend está hecho con React, el backend con Node.js/Express y la base de datos usa MySQL. Este se levanta localmente con Docker, pero igualmente está subido en producción.
+
+---
+
+## Tabla de contenidos
+
+1. [Requisitos](#requisitos)
+2. [Enlaces de producción](#enlaces-de-produccion)
+3. [Credenciales de prueba](#credenciales-para-prueba)
+4. [Levantar el proyecto](#levantar-el-proyecto)
+5. [Variables de entorno](#variables-de-entorno)
+6. [Despliegue en Render](#despliegue-en-render)
+7. [Correr pruebas unitarias](#correr-pruebas-unitarias)
+8. [Correr el linter](#correr-el-linter)
+9. [Documentación de la API](#documentacion-de-la-api)
+10. [Requisitos completados](#requisitos-completados)
 
 ---
 
 ## Requisitos
 
-- Docker
-- Docker Compose
-
-No se necesita instalar Node.js, MySQL ni ninguna otra dependencia de forma local.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) para desarrollo local
+- No se requiere Node.js, npm ni ninguna otra herramienta instalada localmente si se usa Docker.
 
 ---
 
-## Configuración
+## Enlaces de producción
 
-1. Clona el repositorio:
+Es importante saber que el tiempo de carga puede ser un poco más largo la primera vez que se accede a la página, debido a que el servidor se pone en reposo cuando no se está utilizando la aplicación. Simplemente hay que esperar a que inicie sesión, no hace falta tocar nada.
 
-```bash
-   git clone <url-del-repositorio>
-   cd <nombre-del-repositorio>
-```
-
-2. Crea el archivo `.env` a partir del ejemplo:
-
-```bash
-   cp .env.example .env
-```
-
-   El archivo `.env.example` incluye todas las variables necesarias por motivos educativos. Igualmente es necesario que se llenes los campos de MY_SQL_ROOT_PASSWORD y JWT_SECRET con los valores que se deseen para poder levantar el proyecto.
-
----
-
-## Levantar el proyecto
-
-```bash
-docker compose up --build
-```
-
-La primera vez Docker construye las imágenes, inicializa la base de datos
-y carga los datos de prueba automáticamente. Esto puede tomar un tiempo.
-
-Una vez levantado:
-
-| Servicio  | URL                    |
-|-----------|------------------------|
-| Frontend  | http://localhost:5174  |
-| Backend   | http://localhost:3001  |
-| Base de datos | puerto 3306        |
-
-Para detener:
-
-```bash
-docker compose down
-```
-
-Para detener y eliminar los datos (reinicio limpio):
-
-```bash
-docker compose down -v
-docker compose up --build
-```
+- Frontend: https://proyecto-2-web-frontend.onrender.com
+- Backend: https://proyecto-2-web-backend.onrender.com
 
 ---
 
 ## Credenciales de prueba
 
-Al levantar el proyecto por primera vez se cargan datos de prueba que incluyen
-un empleado con usuario y contraseña listo para iniciar sesión.
+Ingresa estos datos en la pantalla de login para poder ingresar al sistema:
 
-Este es el usuario para desarrollo:
+- Usuario: `josesan`
+- Contraseña: `secret`
 
-- Username: josesan
-- Contraseña: secret
 
+---
+
+## Levantar el proyecto
+
+### 1. Clonar el repositorio
+
+```bash
+git clone <url-del-repositorio>
+cd proyecto-2-DB
+```
+
+### 2. Crear el archivo de variables de entorno
+
+Copiar el archivo de ejemplo:
+
+```bash
+cp .env.example .env
+```
+
+Editar `.env` y completar al menos `MYSQL_ROOT_PASSWORD` y `JWT_SECRET` con valores propios. Para el entorno local con Docker Compose, un ejemplo válido sería:
+
+
+```env
+MYSQL_ROOT_PASSWORD=cualquier_password_root
+MYSQL_DATABASE=tienda_db
+MYSQL_USER=proy2
+MYSQL_PASSWORD=secret
+
+BACKEND_PORT=3001
+NODE_ENV=production
+JWT_SECRET=cualquier_clave_secreta_larga
+ALLOWED_ORIGINS=http://localhost:5174
+
+FRONTEND_PORT=5174
+VITE_API_URL=http://localhost:3001
+```
+
+Es importante mencionar que se comparten las variables de entorno por motivos académicos.
+
+### 3. Levantar todos los servicios
+
+```bash
+docker compose --profile app up --build
+```
+
+En ejecuciones posteriores:
+
+```bash
+docker compose --profile app up
+```
+
+Importante: este proyecto usa perfiles en `docker-compose.yml`. Si se omite `--profile app`, los servicios principales (`db`, `backend`, `frontend`) no se levantan.
+
+### 4. Acceder a la aplicación
+
+| Servicio | URL |
+|----------|-----|
+| Frontend | `http://localhost:5174` |
+| Backend | `http://localhost:3001` |
+| API ping | `http://localhost:3001/api/ping` |
+
+La base de datos se inicializa automáticamente con el esquema y los datos de prueba incluidos en `db/`.
+
+### 5. Detener el proyecto
+
+```bash
+docker compose --profile app down 
+```
+
+Para detener y eliminar los volúmenes principales:
+
+```bash
+docker compose --profile app down
+```
 
 ---
 
 ## Variables de entorno
 
-Todas las variables se definen en el archivo `.env`. El repositorio incluye
-`.env.example` con las variables requeridas y sus valores por defecto.
+Es importante mencionar que se comparte esta estructura por motivos académicos.
 
-| Variable            | Descripción                              |
-|---------------------|------------------------------------------|
-| MYSQL_ROOT_PASSWORD | Contraseña del usuario root de MySQL     |
-| MYSQL_DATABASE      | Nombre de la base de datos               |
-| MYSQL_USER          | Usuario de la base de datos (proy2)      |
-| MYSQL_PASSWORD      | Contrasena del usuario (secret)          |
-| BACKEND_PORT        | Puerto del backend (3001)                |
-| FRONTEND_PORT       | Puerto del frontend (5174)               |
-| VITE_API_URL        | URL del backend para el frontend         |
-| JWT_SECRET          | Clave secreta para firmar tokens JWT     |
-| NODE_ENV            | Entorno de ejecución (production)        |
+| Variable | Descripción | Valor recomendado |
+|----------|-------------|-------------------|
+| `MYSQL_ROOT_PASSWORD` | Contraseña del usuario root de MySQL | Libre |
+| `MYSQL_DATABASE` | Nombre de la base de datos | `tienda_db` |
+| `MYSQL_USER` | Usuario de la base de datos | `proy2` |
+| `MYSQL_PASSWORD` | Contraseña del usuario de la base de datos | `secret` |
+| `BACKEND_PORT` | Puerto publicado para el backend | `3001` |
+| `NODE_ENV` | Entorno de Node.js | `production` |
+| `JWT_SECRET` | Clave secreta para firmar los tokens JWT | Libre |
+| `ALLOWED_ORIGINS` | Origen permitido por CORS para el frontend | `http://localhost:5174` |
+| `FRONTEND_PORT` | Puerto publicado para el frontend | `5174` |
+| `VITE_API_URL` | URL del backend que usa el frontend | `http://localhost:3001` |
 
----
 
-## Base de datos
+## Correr pruebas unitarias
 
-**DBMS:** MySQL
+Las pruebas corren dentro de Docker sin necesidad de instalar nada localmente.
 
-**Tablas principales:**
-
-- `categoria` — categoría de productos
-- `proveedor` — proveedores con teléfonos y correos multivaluados
-- `producto` — inventario con precio de compra, venta y stock
-- `empleado` — personal con autenticación
-- `cliente` — clientes registrados con telefonos y correos multivaluados
-- `venta` — información de cada venta con empleado y cliente opcional
-- `detalle_venta` — líneas de productos por venta
-
-**Tablas auxiliares:**
-`telefono_proveedor`, `correo_proveedor`, `telefono_empleado`,
-`correo_empleado`, `telefono_cliente`, `correo_cliente`
-
----
-
-**Índices**
-
-```sql
-CREATE INDEX idx_producto_categoria ON producto (id_categoria);
-CREATE INDEX idx_venta_fecha ON venta (fecha_hora_venta);
-CREATE INDEX idx_venta_empleado ON venta (id_empleado);
+```bash
+docker compose --profile test up --build
 ```
 
-`idx_producto_categoria`: la columna `id_categoria` en `producto` se usa
-bastante para filtrar y agrupar productos por categoría, tanto en la
-lista de productos como en los reportes de ventas por categoría. Sin este
-índice, cada consulta requeriría un escaneo completo de la tabla.
+Esto levanta un contenedor dedicado que ejecuta `npm test` y termina.
 
-`idx_venta_fecha`: la columna `fecha_hora_venta` en `venta` se consulta
-en los reportes ordenados cronológicamente. Al ser un campo DATETIME sobre
-el que se ordena con `ORDER BY`, el índice evita una ordenaciónn completa
-de la tabla en cada consulta.
+### Qué se prueba
 
-`idx_venta_empleado`: la columna `id_empleado` en `venta` se usa en
-JOINs y en el reporte de ventas por empleado, que agrupa y suma totales
-por empleado. El índice acelera tanto el JOIN como el GROUP BY sobre
-esta columna.
+| Test | Descripción | Tests |
+|------|-------------|-------|
+| `ventaFormReducer.test.js` | Reducer de ventas: `SET_FIELD`, `ADD_ITEM`, `REMOVE_ITEM`, `SET_ITEM`, `RESET` | 5 |
+| `ConfirmModal.test.jsx` | Renderizado del modal de confirmación y sus callbacks | 5 |
+| `dashboardCards.test.js` | Función que construye las tarjetas del dashboard | 4 |
 
+---
 
-**Vista:**
+## Correr el linter
 
-```sql
-CREATE VIEW vista_ventas_por_categoria ...
+```bash
+docker compose --profile lint up --build
 ```
 
-Ingresos y unidades vendidas por categoría, utilizada
-por el backend en el reporte de ventas por categoría.
+Esto levanta un contenedor que ejecuta ESLint sobre el frontend y termina. Si no hay errores, el contenedor sale con codigo `0`.
+
+Salida esperada:
+
+```text
+proyecto2_lint exited with code 0
+```
 
 ---
 
-## Funcionalidades
+## Documentación de la API
 
-**CRUD completo:**
-Categorías, Productos, Proveedores, Clientes, Empleados y Ventas.
+Base URL local: `http://localhost:3001`
 
-**Autenticación:**
-Login y logout con sesión basada en JWT. Las rutas del backend están
-protegidas con middleware. El frontend redirige al login si el token
-es inválido o ha expirado.
+Todos los endpoints devuelven JSON. Los endpoints protegidos requieren el header:
 
-**Reportes disponibles en la UI:**
+```text
+Authorization: Bearer <token>
+```
 
-| Reporte | Tipo de consulta |
-|---------|-----------------|
-| Productos con categoría y proveedor | JOIN múltiple |
-| Ventas con empleado y cliente | JOIN múltiple |
-| Información de detalles de ventas | JOIN multiple |
-| Ventas por categoría | VIEW |
-| Clientes con compras registradas | Subconsulta IN |
-| Empleados sobre promedio de su cargo | Subconsulta correlacionada |
-| Resumen de ventas por empleado | GROUP BY + HAVING + agregacion |
-| Productos más vendidos | GROUP BY + HAVING + agregación |
-| Ranking de clientes | CTE (WITH) |
+El token se obtiene al hacer login en `POST /api/auth/login`.
 
-Todos los reportes pueden exportarse a CSV desde la interfaz.
+### Autenticación
 
-**Transacciones explícitas:**
-Las operaciones críticas como crear venta, anular venta, crear/editar cliente,
-proveedor y empleado usan `BEGIN / COMMIT / ROLLBACK` explícitos con
-manejo de error.
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/login` | Iniciar sesión | No |
+| POST | `/api/auth/logout` | Cerrar sesión | No |
+
+Body de `POST /api/auth/login`:
+
+```json
+{
+  "username": "admin",
+  "contrasena": "1234"
+}
+```
+
+Respuesta exitosa:
+
+```json
+{
+  "token": "<jwt>",
+  "nombre_empleado": "Juan Perez",
+  "cargo": "Administrador"
+}
+```
+
+### Categorias `/api/categorias`
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/categorias` | Listar todas las categorías |
+| GET | `/api/categorias/:id` | Obtener una categoría |
+| POST | `/api/categorias` | Crear categoría |
+| PUT | `/api/categorias/:id` | Actualizar categoría |
+| DELETE | `/api/categorias/:id` | Eliminar categoría |
+
+Body de POST y PUT:
+
+```json
+{
+  "nombre_categoria": "Electronica",
+  "descripcion_categoria": "Dispositivos y accesorios electronicos"
+}
+```
+
+### Productos `/api/productos`
+
+| Metodo | Endpoint | Descripcion |
+|--------|----------|-------------|
+| GET | `/api/productos` | Listar todos |
+| GET | `/api/productos/:id` | Obtener uno |
+| POST | `/api/productos` | Crear producto |
+| PUT | `/api/productos/:id` | Actualizar producto |
+| DELETE | `/api/productos/:id` | Eliminar producto |
+
+Body de POST y PUT:
+
+```json
+{
+  "id_categoria": 1,
+  "id_proveedor": 2,
+  "nombre_producto": "Laptop Dell",
+  "descripcion_producto": "Laptop Dell Inspiron 15",
+  "precio_compra": 3500.0,
+  "precio_venta": 4200.0,
+  "stock_actual": 10
+}
+```
+
+### Clientes `/api/clientes`
+
+| Metodo | Endpoint | Descripcion |
+|--------|----------|-------------|
+| GET | `/api/clientes` | Listar todos |
+| GET | `/api/clientes/:id` | Obtener uno |
+| POST | `/api/clientes` | Crear cliente |
+| PUT | `/api/clientes/:id` | Actualizar cliente |
+| DELETE | `/api/clientes/:id` | Eliminar cliente |
+
+Body de POST y PUT:
+
+```json
+{
+  "nombre_cliente": "Maria Garcia",
+  "observaciones": "Cliente frecuente",
+  "telefonos": ["55551234", "55559876"],
+  "correos": ["maria@email.com"]
+}
+```
+
+### Proveedores `/api/proveedores`
+
+| Metodo | Endpoint | Descripcion |
+|--------|----------|-------------|
+| GET | `/api/proveedores` | Listar todos |
+| GET | `/api/proveedores/:id` | Obtener uno |
+| POST | `/api/proveedores` | Crear proveedor |
+| PUT | `/api/proveedores/:id` | Actualizar proveedor |
+| DELETE | `/api/proveedores/:id` | Eliminar proveedor |
+
+Body de POST y PUT:
+
+```json
+{
+  "nombre_proveedor": "Tech Distribuidora",
+  "direccion_proveedor": "Zona 10, Guatemala",
+  "telefonos": ["24441234"],
+  "correos": ["ventas@techdist.com"]
+}
+```
+
+### Empleados `/api/empleados`
+
+| Metodo | Endpoint | Descripcion |
+|--------|----------|-------------|
+| GET | `/api/empleados` | Listar todos |
+| GET | `/api/empleados/:id` | Obtener uno |
+| POST | `/api/empleados` | Crear empleado |
+| PUT | `/api/empleados/:id` | Actualizar empleado |
+| PUT | `/api/empleados/:id/contrasena` | Cambiar contraseña |
+| DELETE | `/api/empleados/:id` | Eliminar empleado |
+
+Body de POST y PUT:
+
+```json
+{
+  "nombre_empleado": "Carlos Lopez",
+  "username": "clopez",
+  "cargo": "Cajero",
+  "fecha_contratacion": "2024-01-15",
+  "estado": "activo",
+  "contrasena": "1234",
+  "telefonos": ["55551234"],
+  "correos": ["carlos@tienda.com"]
+}
+```
+
+### Ventas `/api/ventas`
+
+| Metodo | Endpoint | Descripcion |
+|--------|----------|-------------|
+| GET | `/api/ventas` | Listar todas las ventas |
+| GET | `/api/ventas/:id` | Obtener una venta con su detalle |
+| POST | `/api/ventas` | Registrar nueva venta |
+| DELETE | `/api/ventas/:id` | Anular venta y restaurar stock |
+
+Body de `POST /api/ventas`:
+
+```json
+{
+  "id_empleado": 1,
+  "id_cliente": 3,
+  "items": [
+    { "id_producto": 5, "cantidad": 2 },
+    { "id_producto": 8, "cantidad": 1 }
+  ]
+}
+```
+
+`id_cliente` es opcional. Si se omite, la venta se registra como consumidor final.
+
+### Reportes `/api/reportes`
+
+Todos son `GET`, no requieren body y devuelven un array de objetos.
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `GET /api/reportes/productos-detalle` | Productos con categoría y proveedor |
+| `GET /api/reportes/ventas-completas` | Ventas con empleado y cliente |
+| `GET /api/reportes/detalle-ventas` | Líneas de detalle de todas las ventas |
+| `GET /api/reportes/ventas-por-categoria` | Ingresos y unidades vendidas por categoría |
+| `GET /api/reportes/clientes-con-ventas` | Clientes que tienen al menos una compra |
+| `GET /api/reportes/empleados-sobre-promedio-cargo` | Empleados con más ventas que el promedio de su cargo |
+| `GET /api/reportes/ventas-por-empleado` | Resumen de ventas por empleado |
+| `GET /api/reportes/productos-mas-vendidos` | Top 20 productos por unidades vendidas |
+| `GET /api/reportes/ranking-clientes` | Ranking de clientes por monto total comprado |
+
+### Ping
+
+| Metodo | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/ping` | Verifica que el backend y la BD estén activos |
+
+Respuesta:
+
+```json
+{ "status": "ok", "db": "pong" }
+```
 
 ---
+
+## Requisitos completados
+
+| Categoría | Requisito |
+|-----------|-----------|
+| **Arquitectura y API REST** | Endpoints REST documentados |
+| | CRUD completo vía API (productos, ventas, clientes, entre otros.) |
+| | Manejo de errores con códigos HTTP y mensajes JSON |
+| | Endpoints de agregación |
+| **Frontend - React** | React Router con mínimo 4 rutas |
+| | Estado global con Context (sesión de usuario) |
+| | Hooks: useState, useEffect, useCallback |
+| | useReducer para estado complejo (formulario de ventas) |
+| | Formularios controlados con validación cliente |
+| | Reporte visible en UI (tablas y gráficas) |
+| | Manejo visible de errores para el usuario |
+| **Calidad de código** | ESLint configurado sin errores |
+| | Pruebas unitarias con Vitest |
+| **Despliegue** | README con instrucciones funcionales |
+| | Proyecto levanta con docker compose up sin pasos adicionales | 
+| **Avanzado** | Autenticación de usuarios (login/logout) con Context | 
+| | Exportar reportes a CSV (pantalla de reportes) |
