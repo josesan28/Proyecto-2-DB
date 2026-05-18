@@ -4,20 +4,6 @@
 
 Aplicación web para gestionar el inventario y las ventas de una tienda con diferentes categorías. El frontend está hecho con React, el backend con Node.js/Express y la base de datos usa MySQL. Este se levanta localmente con Docker, pero igualmente está subido en producción.
 
----
-
-## Tabla de contenidos
-
-1. [Requisitos](#requisitos)
-2. [Enlaces de producción](#enlaces-de-produccion)
-3. [Credenciales de prueba](#credenciales-para-prueba)
-4. [Levantar el proyecto](#levantar-el-proyecto)
-5. [Variables de entorno](#variables-de-entorno)
-6. [Despliegue en Render](#despliegue-en-render)
-7. [Correr pruebas unitarias](#correr-pruebas-unitarias)
-8. [Correr el linter](#correr-el-linter)
-9. [Documentación de la API](#documentacion-de-la-api)
-10. [Requisitos completados](#requisitos-completados)
 
 ---
 
@@ -47,7 +33,7 @@ Ingresa estos datos en la pantalla de login para poder ingresar al sistema:
 
 ---
 
-## Levantar el proyecto
+## Levantar el proyecto localmente
 
 ### 1. Clonar el repositorio
 
