@@ -4,8 +4,30 @@ const cors = require("cors");
 const pool = require("./db/pool");
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+
+const normalizeOrigin = (value) => value.replace(/\/+$/, "");
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS
+      .split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+      .map(normalizeOrigin)
+  : ["http://localhost:5174"];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(normalizeOrigin(origin))) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS bloqueado: ${origin}`);
+      callback(new Error('CORS no permitido'));
+    }
+  },
+  credentials: true
+}));
 
 app.get("/api/ping", async (req, res) => {
   try {
