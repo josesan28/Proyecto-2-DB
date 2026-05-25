@@ -1,4 +1,4 @@
-# Proyecto 2 - Sistemas y Tecnologías Web
+# Proyecto 3 - Base de Datos 1
 
 ## José Manuel Sanchez Hernández
 
