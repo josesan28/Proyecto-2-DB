@@ -13,6 +13,7 @@ services:
       - db_data:/var/lib/mysql
       - ./db/01_init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
       - ./db/02_datos_prueba.sql:/docker-entrypoint-initdb.d/02_datos_prueba.sql:ro
+      - ./db/03_roles.sql:/docker-entrypoint-initdb.d/03_roles.sql:ro
     ports:
       - "3306:3306"
     healthcheck:
