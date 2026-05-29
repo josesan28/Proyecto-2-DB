@@ -1,14 +1,18 @@
 const router = require("express").Router();
 const ctrl = require("../controllers/reportesController");
+const requireAuth = require("../middleware/auth");
+const requireRole = require("../middleware/requireRole");
 
-router.get("/productos-detalle", ctrl.productosDetalle);
-router.get("/ventas-completas", ctrl.ventasCompletas);
-router.get("/detalle-ventas", ctrl.detalleVentas);
-router.get("/clientes-con-ventas", ctrl.clientesConVentas);
-router.get("/empleados-sobre-promedio-cargo", ctrl.empleadosSobrePromedioCargo);
-router.get("/ventas-por-categoria", ctrl.ventasPorCategoria);
-router.get("/ventas-por-empleado", ctrl.ventasPorEmpleado);
-router.get("/productos-mas-vendidos", ctrl.productosMasVendidos);
-router.get("/ranking-clientes", ctrl.rankingClientes);
+const auth = [requireAuth, requireRole("auditor")];
+
+router.get("/productos-detalle", ...auth, ctrl.productosDetalle);
+router.get("/ventas-completas", ...auth, ctrl.ventasCompletas);
+router.get("/detalle-ventas", ...auth, ctrl.detalleVentas);
+router.get("/clientes-con-ventas", ...auth, ctrl.clientesConVentas);
+router.get("/empleados-sobre-promedio-cargo", ...auth, ctrl.empleadosSobrePromedioCargo);
+router.get("/ventas-por-categoria", ...auth, ctrl.ventasPorCategoria);
+router.get("/ventas-por-empleado", ...auth, ctrl.ventasPorEmpleado);
+router.get("/productos-mas-vendidos", ...auth, ctrl.productosMasVendidos);
+router.get("/ranking-clientes", ...auth, ctrl.rankingClientes);
 
 module.exports = router;
