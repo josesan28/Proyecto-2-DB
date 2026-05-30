@@ -1,40 +1,25 @@
-const pool = require("../db/pool");
+const { Categoria } = require("../models");
 
-exports.findAll = async () => {
-  const [rows] = await pool.query(
-    "SELECT id_categoria, nombre_categoria, descripcion_categoria FROM categoria ORDER BY nombre_categoria"
-  );
-  return rows;
-};
+exports.findAll = () =>
+  Categoria.findAll({ order: [["nombre_categoria", "ASC"]] });
 
-exports.findById = async (id) => {
-  const [rows] = await pool.query(
-    "SELECT * FROM categoria WHERE id_categoria = ?",
-    [id]
-  );
-  return rows[0] ?? null;
-};
+exports.findById = (id) =>
+  Categoria.findByPk(id).then((r) => r ?? null);
 
 exports.insert = async ({ nombre_categoria, descripcion_categoria }) => {
-  const [result] = await pool.query(
-    "INSERT INTO categoria (nombre_categoria, descripcion_categoria) VALUES (?, ?)",
-    [nombre_categoria, descripcion_categoria ?? null]
-  );
-  return { id_categoria: result.insertId };
+  const cat = await Categoria.create({ nombre_categoria, descripcion_categoria: descripcion_categoria ?? null });
+  return { id_categoria: cat.id_categoria };
 };
 
 exports.update = async (id, { nombre_categoria, descripcion_categoria }) => {
-  const [result] = await pool.query(
-    "UPDATE categoria SET nombre_categoria = ?, descripcion_categoria = ? WHERE id_categoria = ?",
-    [nombre_categoria, descripcion_categoria ?? null, id]
+  const [affected] = await Categoria.update(
+    { nombre_categoria, descripcion_categoria: descripcion_categoria ?? null },
+    { where: { id_categoria: id } }
   );
-  return result.affectedRows;
+  return affected;
 };
 
 exports.remove = async (id) => {
-  const [result] = await pool.query(
-    "DELETE FROM categoria WHERE id_categoria = ?",
-    [id]
-  );
-  return result.affectedRows;
+  const affected = await Categoria.destroy({ where: { id_categoria: id } });
+  return affected;
 };
