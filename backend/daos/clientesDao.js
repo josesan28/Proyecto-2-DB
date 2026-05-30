@@ -1,96 +1,66 @@
-const { Cliente } = require("../models");
-const pool = require("../db/pool");
+const { Cliente, TelefonoCliente, CorreoCliente } = require("../models");
 
-const _fetchContactos = async (id) => {
-  const [telefonos] = await pool.query(
-    "SELECT numero FROM telefono_cliente WHERE id_cliente = ?", [id]
-  );
-  const [correos] = await pool.query(
-    "SELECT correo FROM correo_cliente WHERE id_cliente = ?", [id]
-  );
-  return {
-    telefonos: telefonos.map((t) => t.numero),
-    correos: correos.map((c) => c.correo),
-  };
-};
+const _include = [
+  { model: TelefonoCliente, as: "telefonos", attributes: ["numero"] },
+  { model: CorreoCliente, as: "correos", attributes: ["correo"] },
+];
+
+const _format = (c) => ({
+  ...c.toJSON(),
+  telefonos: c.telefonos.map((t) => t.numero),
+  correos: c.correos.map((r) => r.correo),
+});
 
 exports.findAll = async () => {
-  const clientes = await Cliente.findAll({ order: [["nombre_cliente", "ASC"]] });
-  const result = [];
-  for (const c of clientes) {
-    const contactos = await _fetchContactos(c.id_cliente);
-    result.push({ ...c.toJSON(), ...contactos });
-  }
-  return result;
+  const rows = await Cliente.findAll({ include: _include, order: [["nombre_cliente", "ASC"]] });
+  return rows.map(_format);
 };
 
 exports.findById = async (id) => {
-  const cliente = await Cliente.findByPk(id);
-  if (!cliente) return null;
-  const contactos = await _fetchContactos(id);
-  return { ...cliente.toJSON(), ...contactos };
+  const c = await Cliente.findByPk(id, { include: _include });
+  return c ? _format(c) : null;
 };
 
 exports.insert = async ({ nombre_cliente, observaciones, telefonos = [], correos = [] }) => {
-  const conn = await pool.getConnection();
-  try {
-    await conn.beginTransaction();
-
-    const cliente = await Cliente.create({
-      nombre_cliente,
-      observaciones: observaciones ?? null,
-    });
+  const { sequelize } = require("../models");
+  return sequelize.transaction(async (t) => {
+    const cliente = await Cliente.create(
+      { nombre_cliente, observaciones: observaciones ?? null },
+      { transaction: t }
+    );
     const id = cliente.id_cliente;
-
-    for (const numero of telefonos)
-      await conn.query(
-        "INSERT INTO telefono_cliente (id_cliente, numero) VALUES (?, ?)", [id, numero]
-      );
-    for (const correo of correos)
-      await conn.query(
-        "INSERT INTO correo_cliente (id_cliente, correo) VALUES (?, ?)", [id, correo]
-      );
-
-    await conn.commit();
+    await TelefonoCliente.bulkCreate(
+      telefonos.map((numero) => ({ id_cliente: id, numero })),
+      { transaction: t }
+    );
+    await CorreoCliente.bulkCreate(
+      correos.map((correo) => ({ id_cliente: id, correo })),
+      { transaction: t }
+    );
     return { id_cliente: id };
-  } catch (err) {
-    await conn.rollback();
-    throw err;
-  } finally {
-    conn.release();
-  }
+  });
 };
 
 exports.update = async (id, { nombre_cliente, observaciones, telefonos = [], correos = [] }) => {
-  const conn = await pool.getConnection();
-  try {
-    await conn.beginTransaction();
-
+  const { sequelize } = require("../models");
+  return sequelize.transaction(async (t) => {
     const [affected] = await Cliente.update(
       { nombre_cliente, observaciones: observaciones ?? null },
-      { where: { id_cliente: id } }
+      { where: { id_cliente: id }, transaction: t }
     );
-    if (!affected) { await conn.rollback(); return 0; }
-
-    await conn.query("DELETE FROM telefono_cliente WHERE id_cliente = ?", [id]);
-    await conn.query("DELETE FROM correo_cliente   WHERE id_cliente = ?", [id]);
-    for (const numero of telefonos)
-      await conn.query(
-        "INSERT INTO telefono_cliente (id_cliente, numero) VALUES (?, ?)", [id, numero]
-      );
-    for (const correo of correos)
-      await conn.query(
-        "INSERT INTO correo_cliente (id_cliente, correo) VALUES (?, ?)", [id, correo]
-      );
-
-    await conn.commit();
+    if (!affected) return 0;
+    await TelefonoCliente.destroy({ where: { id_cliente: id }, transaction: t });
+    await CorreoCliente.destroy({   where: { id_cliente: id }, transaction: t });
+    await TelefonoCliente.bulkCreate(
+      telefonos.map((numero) => ({ id_cliente: id, numero })),
+      { transaction: t }
+    );
+    await CorreoCliente.bulkCreate(
+      correos.map((correo) => ({ id_cliente: id, correo })),
+      { transaction: t }
+    );
     return affected;
-  } catch (err) {
-    await conn.rollback();
-    throw err;
-  } finally {
-    conn.release();
-  }
+  });
 };
 
 exports.remove = async (id) =>
