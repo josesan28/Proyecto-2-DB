@@ -47,6 +47,7 @@ app.use("/api/proveedores", require("./routes/proveedores"));
 app.use("/api/empleados", require("./routes/empleados"));
 app.use("/api/ventas", require("./routes/ventas"));
 app.use("/api/reportes", require("./routes/reportes"));
+app.use("/api/stock", require("./routes/stock"));
 
 app.use((req, res) => {
   res.status(404).json({ error: "Ruta no encontrada" });

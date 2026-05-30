@@ -1,5 +1,4 @@
 -- Stored Procedures
-
 USE tienda_db;
 
 DELIMITER $$
@@ -12,7 +11,7 @@ CREATE PROCEDURE sp_registrar_venta(
   OUT p_id_venta INT,
   OUT p_error VARCHAR(255)
 )
-BEGIN
+sp_registrar_venta_block: BEGIN
   DECLARE v_total       DECIMAL(12,2) DEFAULT 0;
   DECLARE v_precio      DECIMAL(10,2);
   DECLARE v_stock       INT;
@@ -35,7 +34,6 @@ BEGIN
   SET p_id_venta = NULL;
   SET p_error = NULL;
 
-  -- Validar empleado activo
   SELECT id_empleado INTO v_empleado
   FROM empleado
   WHERE id_empleado = p_id_empleado AND estado = 'activo'
@@ -43,14 +41,13 @@ BEGIN
 
   IF v_empleado IS NULL THEN
     SET p_error = 'Empleado no encontrado o inactivo';
-    LEAVE sp_registrar_venta;
+    LEAVE sp_registrar_venta_block;
   END IF;
 
   START TRANSACTION;
 
   SET v_n = JSON_LENGTH(p_items);
 
-  -- Validar stock de todos los items antes de insertar
   WHILE v_i < v_n DO
     SET v_id_producto = JSON_UNQUOTE(JSON_EXTRACT(p_items, CONCAT('$[', v_i, '].id_producto')));
     SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(p_items, CONCAT('$[', v_i, '].cantidad')));
@@ -64,14 +61,13 @@ BEGIN
     IF v_stock IS NULL THEN
       ROLLBACK;
       SET p_error = CONCAT('Producto ', v_id_producto, ' no encontrado');
-      LEAVE sp_registrar_venta;
+      LEAVE sp_registrar_venta_block;
     END IF;
 
     IF v_stock < v_cantidad THEN
       ROLLBACK;
-      SET p_error = CONCAT('Stock insuficiente para producto ', v_id_producto,
-                           '. Disponible: ', v_stock);
-      LEAVE sp_registrar_venta;
+      SET p_error = CONCAT('Stock insuficiente para producto ', v_id_producto, '. Disponible: ', v_stock);
+      LEAVE sp_registrar_venta_block;
     END IF;
 
     SET v_subtotal = ROUND(v_precio * v_cantidad, 2);
@@ -79,20 +75,18 @@ BEGIN
     SET v_i = v_i + 1;
   END WHILE;
 
-  -- Insertar venta
   INSERT INTO venta (id_empleado, id_cliente, total)
   VALUES (p_id_empleado, p_id_cliente, ROUND(v_total, 2));
 
   SET p_id_venta = LAST_INSERT_ID();
 
-  -- Insertar detalle y decrementar stock
   SET v_i = 0;
   WHILE v_i < v_n DO
     SET v_id_producto = JSON_UNQUOTE(JSON_EXTRACT(p_items, CONCAT('$[', v_i, '].id_producto')));
     SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(p_items, CONCAT('$[', v_i, '].cantidad')));
 
     SELECT precio_venta INTO v_precio
-    FROM   producto WHERE id_producto = v_id_producto;
+    FROM producto WHERE id_producto = v_id_producto;
 
     SET v_subtotal = ROUND(v_precio * v_cantidad, 2);
 
@@ -114,7 +108,7 @@ CREATE PROCEDURE sp_anular_venta(
   IN  p_id_venta INT,
   OUT p_error    VARCHAR(255)
 )
-BEGIN
+sp_anular_venta_block: BEGIN
   DECLARE v_existe INT DEFAULT 0;
 
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -129,16 +123,15 @@ BEGIN
 
   IF v_existe = 0 THEN
     SET p_error = 'Venta no encontrada';
-    LEAVE sp_anular_venta;
+    LEAVE sp_anular_venta_block;
   END IF;
 
   START TRANSACTION;
 
-  -- Restaurar stock
   UPDATE producto p
-  JOIN   detalle_venta dv ON p.id_producto = dv.id_producto
-  SET    p.stock_actual   = p.stock_actual + dv.cantidad
-  WHERE  dv.id_venta      = p_id_venta;
+  JOIN detalle_venta dv ON p.id_producto = dv.id_producto
+  SET p.stock_actual = p.stock_actual + dv.cantidad
+  WHERE dv.id_venta = p_id_venta;
 
   DELETE FROM venta WHERE id_venta = p_id_venta;
 
@@ -152,7 +145,7 @@ CREATE PROCEDURE sp_ajustar_stock(
   OUT p_stock_nuevo INT,
   OUT p_error VARCHAR(255)
 )
-BEGIN
+sp_ajustar_stock_block: BEGIN
   DECLARE v_stock_actual INT;
 
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -169,22 +162,22 @@ BEGIN
 
   IF v_stock_actual IS NULL THEN
     SET p_error = 'Producto no encontrado';
-    LEAVE sp_ajustar_stock;
+    LEAVE sp_ajustar_stock_block;
   END IF;
 
   IF v_stock_actual + p_cantidad < 0 THEN
     SET p_error = CONCAT('Stock insuficiente. Actual: ', v_stock_actual);
-    LEAVE sp_ajustar_stock;
+    LEAVE sp_ajustar_stock_block;
   END IF;
 
   START TRANSACTION;
 
   UPDATE producto
-  SET    stock_actual = stock_actual + p_cantidad
-  WHERE  id_producto  = p_id_producto;
+  SET stock_actual = stock_actual + p_cantidad
+  WHERE id_producto = p_id_producto;
 
   SELECT stock_actual INTO p_stock_nuevo
-  FROM   producto WHERE id_producto = p_id_producto;
+  FROM producto WHERE id_producto = p_id_producto;
 
   COMMIT;
 END$$
@@ -197,7 +190,7 @@ CREATE PROCEDURE sp_upsert_cliente(
   OUT p_result_id INT,
   OUT p_error VARCHAR(255)
 )
-BEGIN
+sp_upsert_cliente_block: BEGIN
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
   BEGIN
     ROLLBACK;
@@ -208,7 +201,7 @@ BEGIN
 
   IF p_nombre IS NULL OR p_nombre = '' THEN
     SET p_error = 'nombre_cliente es obligatorio';
-    LEAVE sp_upsert_cliente;
+    LEAVE sp_upsert_cliente_block;
   END IF;
 
   START TRANSACTION;
@@ -219,9 +212,9 @@ BEGIN
     SET p_result_id = LAST_INSERT_ID();
   ELSE
     UPDATE cliente
-    SET    nombre_cliente = p_nombre,
-           observaciones  = p_observaciones
-    WHERE  id_cliente     = p_id_cliente;
+    SET nombre_cliente = p_nombre,
+        observaciones = p_observaciones
+    WHERE id_cliente = p_id_cliente;
     SET p_result_id = p_id_cliente;
   END IF;
 
@@ -255,8 +248,8 @@ BEGIN
     COUNT(dv.id_detalle_venta) AS num_productos
   FROM venta v
   JOIN empleado e ON v.id_empleado = e.id_empleado
-  LEFT JOIN cliente c ON v.id_cliente  = c.id_cliente
-  JOIN  detalle_venta dv ON dv.id_venta = v.id_venta
+  LEFT JOIN cliente c ON v.id_cliente = c.id_cliente
+  JOIN detalle_venta dv ON dv.id_venta = v.id_venta
   WHERE DATE(v.fecha_hora_venta) BETWEEN p_fecha_inicio AND p_fecha_fin
   GROUP BY v.id_venta, fecha, e.nombre_empleado, cliente, v.total
   ORDER BY fecha DESC;
