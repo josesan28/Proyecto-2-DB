@@ -9,5 +9,6 @@ router.get("/:id", requireAuth, requireRole(...VIEW_CLIENTS), ctrl.getOne);
 router.post("/", requireAuth, requireRole(...MANAGE_CLIENTS), ctrl.create);
 router.put("/:id", requireAuth, requireRole(...MANAGE_CLIENTS), ctrl.update);
 router.delete("/:id", requireAuth, requireRole(...MANAGE_CLIENTS), ctrl.remove);
+router.post("/procedimiento", requireAuth, requireRole(...MANAGE_CLIENTS), ctrl.upsertPorProcedimiento);
 
 module.exports = router;

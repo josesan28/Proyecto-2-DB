@@ -1,4 +1,4 @@
---  Proyecto 2 - Bases de Datos 1
+--  Proyecto 3 - Bases de Datos 1
 --  DDL - MySQL
 
 

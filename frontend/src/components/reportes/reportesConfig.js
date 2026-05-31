@@ -6,6 +6,7 @@ export const REPORTES = [
   { id: 'clientes-con-ventas', label: 'Clientes con compras registradas' },
   { id: 'empleados-sobre-promedio-cargo', label: 'Empleados sobre promedio de su cargo' },
   { id: 'ventas-por-empleado', label: 'Resumen de ventas por empleado' },
+  { id: 'ventas-por-periodo', label: 'Ventas por período' },
   { id: 'productos-mas-vendidos', label: 'Productos más vendidos' },
   { id: 'ranking-clientes', label: 'Ranking de clientes' },
 ]

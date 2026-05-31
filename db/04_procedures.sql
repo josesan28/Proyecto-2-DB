@@ -221,38 +221,62 @@ sp_upsert_cliente_block: BEGIN
   COMMIT;
 END$$
 
--- Procedimiento 5: Reporte de ventas por rango de fechas
+-- Procedimiento 5: Resumen de ventas por rango de fechas
 CREATE PROCEDURE sp_reporte_ventas_periodo(
   IN p_fecha_inicio DATE,
   IN p_fecha_fin    DATE
 )
 BEGIN
+  DECLARE v_min DATE;
+  DECLARE v_max DATE;
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
   BEGIN
     SELECT 'Error al generar reporte' AS error;
   END;
 
+  SELECT MIN(DATE(fecha_hora_venta)), MAX(DATE(fecha_hora_venta))
+  INTO v_min, v_max
+  FROM venta;
+
   IF p_fecha_inicio IS NULL THEN
-    SET p_fecha_inicio = DATE_SUB(CURDATE(), INTERVAL 30 DAY);
+    SET p_fecha_inicio = COALESCE(v_min, DATE_SUB(CURDATE(), INTERVAL 30 DAY));
   END IF;
   IF p_fecha_fin IS NULL THEN
-    SET p_fecha_fin = CURDATE();
+    SET p_fecha_fin = COALESCE(v_max, CURDATE());
   END IF;
 
+  WITH ventas_dia AS (
+    SELECT
+      DATE(v.fecha_hora_venta) AS fecha,
+      COUNT(*) AS total_ventas,
+      ROUND(SUM(v.total), 2) AS total_facturado,
+      ROUND(AVG(v.total), 2) AS ticket_promedio,
+      ROUND(MIN(v.total), 2) AS ticket_minimo,
+      ROUND(MAX(v.total), 2) AS ticket_maximo
+    FROM venta v
+    WHERE DATE(v.fecha_hora_venta) BETWEEN p_fecha_inicio AND p_fecha_fin
+    GROUP BY DATE(v.fecha_hora_venta)
+  ),
+  productos_dia AS (
+    SELECT
+      DATE(v.fecha_hora_venta) AS fecha,
+      COUNT(dv.id_detalle_venta) AS total_productos_vendidos
+    FROM venta v
+    JOIN detalle_venta dv ON dv.id_venta = v.id_venta
+    WHERE DATE(v.fecha_hora_venta) BETWEEN p_fecha_inicio AND p_fecha_fin
+    GROUP BY DATE(v.fecha_hora_venta)
+  )
   SELECT
-    v.id_venta,
-    DATE(v.fecha_hora_venta) AS fecha,
-    e.nombre_empleado,
-    COALESCE(c.nombre_cliente, 'Consumidor final') AS cliente,
-    v.total,
-    COUNT(dv.id_detalle_venta) AS num_productos
-  FROM venta v
-  JOIN empleado e ON v.id_empleado = e.id_empleado
-  LEFT JOIN cliente c ON v.id_cliente = c.id_cliente
-  JOIN detalle_venta dv ON dv.id_venta = v.id_venta
-  WHERE DATE(v.fecha_hora_venta) BETWEEN p_fecha_inicio AND p_fecha_fin
-  GROUP BY v.id_venta, fecha, e.nombre_empleado, cliente, v.total
-  ORDER BY fecha DESC;
+    vd.fecha,
+    vd.total_ventas,
+    COALESCE(pd.total_productos_vendidos, 0) AS total_productos_vendidos,
+    vd.total_facturado,
+    vd.ticket_promedio,
+    vd.ticket_minimo,
+    vd.ticket_maximo
+  FROM ventas_dia vd
+  LEFT JOIN productos_dia pd ON pd.fecha = vd.fecha
+  ORDER BY vd.fecha DESC;
 END$$
 
 DELIMITER ;

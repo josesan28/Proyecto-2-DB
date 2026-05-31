@@ -1,3 +1,4 @@
+const pool = require("../db/pool");
 const dao = require("../daos/clientesDao");
 
 exports.getAll = () => dao.findAll();
@@ -23,4 +24,29 @@ exports.remove = async (id) => {
   const affected = await dao.remove(id);
   if (!affected) throw Object.assign(new Error("Cliente no encontrado"), { status: 404 });
   return { message: "Cliente eliminado" };
+};
+
+exports.upsertPorProcedimiento = async ({ id_cliente, nombre_cliente, observaciones }) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.query(
+      "CALL sp_upsert_cliente(?, ?, ?, @result_id, @error)",
+      [id_cliente ?? null, nombre_cliente, observaciones ?? null]
+    );
+
+    const [[out]] = await conn.query("SELECT @result_id AS result_id, @error AS error");
+
+    if (out.error) {
+      const err = new Error(out.error);
+      err.status = 400;
+      throw err;
+    }
+
+    return {
+      id_cliente: out.result_id,
+      message: id_cliente ? "Cliente actualizado" : "Cliente creado",
+    };
+  } finally {
+    conn.release();
+  }
 };

@@ -38,3 +38,13 @@ exports.remove = async (req, res) => {
   try { res.json(await service.remove(req.params.id)); }
   catch (err) { handle(err, res); }
 };
+
+exports.upsertPorProcedimiento = async (req, res) => {
+  if (!req.body.nombre_cliente)
+    return res.status(400).json({ error: "nombre_cliente es obligatorio" });
+  try {
+    const result = await service.upsertPorProcedimiento(req.body);
+    res.status(req.body.id_cliente ? 200 : 201).json(result);
+  }
+  catch (err) { handle(err, res); }
+};

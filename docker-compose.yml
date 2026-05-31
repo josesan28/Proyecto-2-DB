@@ -1,7 +1,7 @@
 services:
   db:
     image: mysql:8.0
-    container_name: proyecto2_db
+    container_name: proyecto3_db
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -25,13 +25,11 @@ services:
       retries: 5
     networks:
       - app_network
-    profiles: [app]
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: proyecto2_backend
+    container_name: proyecto3_backend
     restart: unless-stopped
     environment:
       DB_HOST: db
@@ -50,15 +48,13 @@ services:
         condition: service_healthy
     networks:
       - app_network
-    profiles: [app]
-
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL}
-    container_name: proyecto2_frontend
+    container_name: proyecto3_frontend
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT}:80"
@@ -66,13 +62,11 @@ services:
       - backend
     networks:
       - app_network
-    profiles: [app]
-  
   lint:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    container_name: proyecto2_lint
+    container_name: proyecto3_lint
     command: npm run lint
     profiles: [lint]
     networks:
@@ -82,7 +76,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    container_name: proyecto2_test
+    container_name: proyecto3_test
     command: npm test
     profiles: [test]
     networks:

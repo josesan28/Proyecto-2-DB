@@ -15,5 +15,6 @@ router.get("/ventas-por-categoria", ...auth, ctrl.ventasPorCategoria);
 router.get("/ventas-por-empleado", ...auth, ctrl.ventasPorEmpleado);
 router.get("/productos-mas-vendidos", ...auth, ctrl.productosMasVendidos);
 router.get("/ranking-clientes", ...auth, ctrl.rankingClientes);
+router.get("/ventas-por-periodo", ...auth, ctrl.ventasPorPeriodo);
 
 module.exports = router;

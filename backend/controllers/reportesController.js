@@ -1,7 +1,7 @@
 const service = require("../services/reportesService");
 
 const wrap = (fn) => async (req, res) => {
-  try { res.json(await fn()); }
+  try { res.json(await fn(req)); }
   catch (err) { res.status(500).json({ error: err.message }); }
 };
 
@@ -14,3 +14,4 @@ exports.ventasPorCategoria = wrap(() => service.ventasPorCategoria());
 exports.ventasPorEmpleado = wrap(() => service.ventasPorEmpleado());
 exports.productosMasVendidos = wrap(() => service.productosMasVendidos());
 exports.rankingClientes = wrap(() => service.rankingClientes());
+exports.ventasPorPeriodo = wrap((req) => service.ventasPorPeriodo(req.query.inicio, req.query.fin));

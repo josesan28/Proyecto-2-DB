@@ -21,6 +21,12 @@ const CHART_CONFIG = {
     getValue: row => parseFloat(row.monto_total),
     unit: 'Q ',
   },
+  'ventas-por-periodo': {
+    title: 'Facturación por día dentro del período (Q)',
+    getLabel: row => row.fecha,
+    getValue: row => parseFloat(row.total_facturado),
+    unit: 'Q ',
+  },
   'productos-mas-vendidos': {
     title: 'Unidades vendidas por producto (top 10)',
     getLabel: row => row.nombre_producto,
@@ -35,16 +41,31 @@ export default function Reportes() {
   const [active, setActive] = useState(null)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
+  const [periodoInicio, setPeriodoInicio] = useState('')
+  const [periodoFin, setPeriodoFin] = useState('')
 
-  const cargar = async (reporte) => {
+  const cargar = async (reporte, filtros = {}) => {
     setActive(reporte.id)
     setData([])
     setLoading(true)
     try {
-      const rows = await api.get(`/api/reportes/${reporte.id}`)
+      const params = new URLSearchParams()
+      if (reporte.id === 'ventas-por-periodo') {
+        if (filtros.inicio) params.set('inicio', filtros.inicio)
+        if (filtros.fin) params.set('fin', filtros.fin)
+      }
+
+      const query = params.toString()
+      const rows = await api.get(`/api/reportes/${reporte.id}${query ? `?${query}` : ''}`)
       setData(rows)
     } catch (e) { toast(e.message, 'error') }
     finally { setLoading(false) }
+  }
+
+  const aplicarPeriodo = async () => {
+    const reporte = REPORTES.find(r => r.id === 'ventas-por-periodo')
+    if (!reporte) return
+    await cargar(reporte, { inicio: periodoInicio || undefined, fin: periodoFin || undefined })
   }
 
   const exportCSV = () => {
@@ -84,6 +105,55 @@ export default function Reportes() {
         <ReportesMenu reportes={REPORTES} active={active} onSelect={cargar} />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {active === 'ventas-por-periodo' && (
+            <div className="card" style={{ padding: '16px 20px' }}>
+              <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 12 }}>
+                Filtrar por período
+              </p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: 12,
+                  alignItems: 'end',
+                }}
+              >
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label>Fecha inicio</label>
+                  <input
+                    type="date"
+                    value={periodoInicio}
+                    onChange={e => setPeriodoInicio(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label>Fecha fin</label>
+                  <input
+                    type="date"
+                    value={periodoFin}
+                    onChange={e => setPeriodoFin(e.target.value)}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <button className="btn-primary" onClick={aplicarPeriodo}>
+                    Aplicar filtro
+                  </button>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => {
+                      setPeriodoInicio('')
+                      setPeriodoFin('')
+                      const reporte = REPORTES.find(r => r.id === 'ventas-por-periodo')
+                      if (reporte) cargar(reporte, {})
+                    }}
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {!loading && chartData && chartData.length > 0 && (
             <div className="card" style={{ padding: '16px 20px' }}>
               <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 12 }}>
