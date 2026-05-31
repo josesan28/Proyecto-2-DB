@@ -2,8 +2,9 @@ const router = require("express").Router();
 const ctrl = require("../controllers/reportesController");
 const requireAuth = require("../middleware/auth");
 const requireRole = require("../middleware/requireRole");
+const { VIEW_REPORTS } = require("../permissions");
 
-const auth = [requireAuth, requireRole("auditor")];
+const auth = [requireAuth, requireRole(...VIEW_REPORTS)];
 
 router.get("/productos-detalle", ...auth, ctrl.productosDetalle);
 router.get("/ventas-completas", ...auth, ctrl.ventasCompletas);
