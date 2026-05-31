@@ -14,7 +14,7 @@ CREATE ROLE IF NOT EXISTS 'rol_auditor';
 -- Administrador: control total
 GRANT ALL PRIVILEGES ON tienda_db.* TO 'rol_admin';
 
--- Gerente: todo menos eliminar empleados o modificar roles
+-- Gerente: todo excepto crear/editar empleados. Puede eliminar casi todo, menos empleados
 GRANT SELECT, INSERT, UPDATE, DELETE ON tienda_db.categoria TO 'rol_gerente';
 GRANT SELECT, INSERT, UPDATE, DELETE ON tienda_db.proveedor TO 'rol_gerente';
 GRANT SELECT, INSERT, UPDATE, DELETE ON tienda_db.telefono_proveedor TO 'rol_gerente';
@@ -30,7 +30,7 @@ GRANT SELECT ON tienda_db.telefono_empleado TO 'rol_gerente';
 GRANT SELECT ON tienda_db.correo_empleado TO 'rol_gerente';
 GRANT SELECT ON tienda_db.vista_ventas_por_categoria TO 'rol_gerente';
 
--- Vendedor: registrar ventas y consultar productos y clientes
+-- Vendedor: ver productos, registrar ventas y gestionar clientes
 GRANT SELECT ON tienda_db.producto TO 'rol_vendedor';
 GRANT SELECT ON tienda_db.categoria TO 'rol_vendedor';
 GRANT SELECT ON tienda_db.proveedor TO 'rol_vendedor';

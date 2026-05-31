@@ -1,22 +1,25 @@
 import { NavLink, useNavigate } from "react-router-dom"
 import { BarChart3, Home, LogOut, Package2, ShoppingCart, Tags, Truck, UserRound, Users, Store } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
+import { useRole } from "../../hooks/useRole"
+import { PAGE_ROLES } from "../../permissions"
 import { api } from "../../api"
 import "./Sidebar.css"
 
-const links = [
-  { to: "/", label: "Inicio", icon: Home },
-  { to: "/productos", label: "Productos", icon: Package2 },
-  { to: "/categorias", label: "Categorías", icon: Tags },
-  { to: "/proveedores", label: "Proveedores", icon: Truck },
-  { to: "/clientes", label: "Clientes", icon: Users },
-  { to: "/empleados", label: "Empleados", icon: UserRound },
-  { to: "/ventas", label: "Ventas", icon: ShoppingCart },
-  { to: "/reportes", label: "Reportes", icon: BarChart3 },
+const ALL_LINKS = [
+  { to: "/", label: "Inicio", icon: Home, allowed: PAGE_ROLES.home },
+  { to: "/productos", label: "Productos", icon: Package2, allowed: PAGE_ROLES.productos },
+  { to: "/categorias", label: "Categorías", icon: Tags, allowed: PAGE_ROLES.categorias },
+  { to: "/proveedores", label: "Proveedores", icon: Truck, allowed: PAGE_ROLES.proveedores },
+  { to: "/clientes", label: "Clientes", icon: Users, allowed: PAGE_ROLES.clientes },
+  { to: "/empleados", label: "Empleados", icon: UserRound, allowed: PAGE_ROLES.empleados },
+  { to: "/ventas", label: "Ventas", icon: ShoppingCart, allowed: PAGE_ROLES.ventas },
+  { to: "/reportes", label: "Reportes", icon: BarChart3, allowed: PAGE_ROLES.reportes },
 ]
 
 export default function Sidebar() {
   const { empleado, logout } = useAuth()
+  const { can } = useRole()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -24,6 +27,8 @@ export default function Sidebar() {
     logout()
     navigate("/login")
   }
+
+  const links = ALL_LINKS.filter((l) => can(...l.allowed))
 
   return (
     <aside className="sidebar">
@@ -33,7 +38,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        {links.map(l => (
+        {links.map((l) => (
           <NavLink
             key={l.to}
             to={l.to}

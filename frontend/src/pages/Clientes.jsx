@@ -6,6 +6,7 @@ import { emptyClienteForm } from '../components/clientes/clienteForm'
 import { useToast } from '../components/ui/Toast'
 import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
+import {useRole} from "../hooks/useRole";
 
 export default function Clientes() {
   const toast = useToast()
@@ -16,6 +17,7 @@ export default function Clientes() {
   const [form, setForm] = useState(emptyClienteForm)
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
+  const { can } = useRole()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -98,7 +100,9 @@ export default function Clientes() {
     <div>
       <div className="page-header">
         <div><h1>Clientes</h1><p>{items.length} clientes registrados</p></div>
-        <button className="btn-primary" onClick={openCreate}>+ Nuevo cliente</button>
+        {can('vendedor') && (
+          <button className="btn-primary" onClick={openCreate}>+ Nuevo cliente</button>
+        )}
       </div>
 
       <div className="card">

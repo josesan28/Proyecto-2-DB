@@ -6,6 +6,7 @@ import { emptyProveedorForm } from '../components/proveedores/proveedorForm'
 import { useToast } from '../components/ui/Toast'
 import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
+import {useRole} from "../hooks/useRole";
 
 export default function Proveedores() {
   const toast = useToast()
@@ -16,6 +17,7 @@ export default function Proveedores() {
   const [form, setForm] = useState(emptyProveedorForm)
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
+  const { can } = useRole()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -98,7 +100,9 @@ export default function Proveedores() {
     <div>
       <div className="page-header">
         <div><h1>Proveedores</h1><p>{items.length} proveedores registrados</p></div>
-        <button className="btn-primary" onClick={openCreate}>+ Nuevo proveedor</button>
+        {can('bodeguero') && (
+          <button className="btn-primary" onClick={openCreate}>+ Nuevo proveedor</button>
+        )}
       </div>
 
       <div className="card">

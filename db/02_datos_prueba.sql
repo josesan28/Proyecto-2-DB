@@ -60,6 +60,11 @@ INSERT INTO correo_proveedor (id_proveedor, correo) VALUES
 -- EMPLEADOS
 INSERT INTO empleado (nombre_empleado, username, hash_contrasena, cargo, fecha_contratacion, estado) VALUES
 ('José Sanchez',    'josesan',  '$2a$10$ZLSNHefmGewDJdzLSWNRG.ZIOGBuvJKjAaZgrQ5oGYngDWiP9AvSS', 'Vendedor', '2018-03-15', 'activo'),
+('Admin de Prueba',     'admin',     '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin',     '2024-01-01', 'activo'),
+('Gerente de Prueba',    'gerente',   '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'gerente',   '2024-01-01', 'activo'),
+('Vendedor de Prueba',      'vendedor',  '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'vendedor',  '2024-01-01', 'activo'),
+('Bodeguero de Prueba',     'bodeguero', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'bodeguero', '2024-01-01', 'activo'),
+('Auditor de Prueba',    'auditor',   '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'auditor',   '2024-01-01', 'activo'),
 ('Ana Lucía Rodríguez',     'ana.rodriguez',   '$2b$12$def1234567890ABCDEFGHIJ', 'Jefe de Ventas',     '2019-07-01', 'activo'),
 ('Diego Fuentes López',     'diego.fuentes',   '$2b$12$ghi1234567890ABCDEFGHIJ', 'Vendedor',           '2020-01-10', 'activo'),
 ('María José García',       'maria.garcia',    '$2b$12$jkl1234567890ABCDEFGHIJ', 'Vendedora',          '2020-06-20', 'activo'),

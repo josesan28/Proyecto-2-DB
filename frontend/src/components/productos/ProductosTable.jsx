@@ -1,15 +1,21 @@
-export default function ProductosTable({ loading, items, onEdit, onDelete }) {
-  if (loading) return <div className="spinner" />
+import { useRole } from "../../hooks/useRole"
 
-  if (items.length === 0) {
+export default function ProductosTable({ loading, items, onEdit, onDelete }) {
+  const { can } = useRole()
+
+  if (loading) return <div className="spinner" />
+  if (items.length === 0)
     return <div className="empty-state"><p>No hay productos.</p></div>
-  }
 
   return (
     <div className="table-wrapper">
       <table>
         <thead>
-          <tr><th>Nombre</th><th>Categoría</th><th>Proveedor</th><th>P. venta</th><th>Stock</th><th></th></tr>
+          <tr>
+            <th>Nombre</th><th>Categoría</th><th>Proveedor</th>
+            <th>P. venta</th><th>Stock</th>
+            {can("bodeguero") && <th></th>}
+          </tr>
         </thead>
         <tbody>
           {items.map(p => (
@@ -19,14 +25,18 @@ export default function ProductosTable({ loading, items, onEdit, onDelete }) {
               <td>{p.nombre_proveedor}</td>
               <td>Q {parseFloat(p.precio_venta).toFixed(2)}</td>
               <td>
-                <span className={`badge ${p.stock_actual < 5 ? 'badge-red' : p.stock_actual < 15 ? 'badge-yellow' : 'badge-green'}`}>
+                <span className={`badge ${p.stock_actual < 5 ? "badge-red" : p.stock_actual < 15 ? "badge-yellow" : "badge-green"}`}>
                   {p.stock_actual}
                 </span>
               </td>
-              <td className="actions">
-                <button className="btn-secondary btn-sm" onClick={() => onEdit(p)}>Editar</button>
-                <button className="btn-danger btn-sm" onClick={() => onDelete(p.id_producto)}>Eliminar</button>
-              </td>
+              {can("bodeguero") && (
+                <td className="actions">
+                  <button className="btn-secondary btn-sm" onClick={() => onEdit(p)}>Editar</button>
+                  {can("bodeguero") && (
+                    <button className="btn-danger btn-sm" onClick={() => onDelete(p.id_producto)}>Eliminar</button>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

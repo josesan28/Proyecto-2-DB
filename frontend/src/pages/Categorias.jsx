@@ -6,6 +6,7 @@ import { emptyCategoriaForm } from '../components/categorias/categoriaForm'
 import { useToast } from '../components/ui/Toast'
 import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
+import { useRole } from '../hooks/useRole'
 
 export default function Categorias() {
   const toast = useToast()
@@ -15,6 +16,7 @@ export default function Categorias() {
   const [modal, setModal] = useState(null)
   const [form, setForm] = useState(emptyCategoriaForm)
   const [editId, setEditId] = useState(null)
+  const { can } = useRole()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -77,7 +79,9 @@ export default function Categorias() {
     <div>
       <div className="page-header">
         <div><h1>Categorías</h1><p>{items.length} categorías registradas</p></div>
-        <button className="btn-primary" onClick={openCreate}>+ Nueva categoría</button>
+        {can("bodeguero") && (
+          <button className="btn-primary" onClick={openCreate}>+ Nueva categoría</button>
+        )}
       </div>
 
       <div className="card">

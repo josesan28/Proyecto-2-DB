@@ -6,6 +6,7 @@ import { emptyProductoForm } from '../components/productos/productoForm'
 import { useToast } from '../components/ui/Toast'
 import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
+import {useRole} from "../hooks/useRole";
 
 export default function Productos() {
   const toast = useToast()
@@ -18,6 +19,7 @@ export default function Productos() {
   const [form, setForm] = useState(emptyProductoForm)
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
+  const { can } = useRole()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -100,7 +102,9 @@ export default function Productos() {
     <div>
       <div className="page-header">
         <div><h1>Productos</h1><p>{items.length} productos registrados</p></div>
-        <button className="btn-primary" onClick={openCreate}>+ Nuevo producto</button>
+        {can('bodeguero') && (
+          <button className="btn-primary" onClick={openCreate}>+ Nuevo producto</button>
+        )}
       </div>
 
       <div className="card">

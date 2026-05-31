@@ -6,6 +6,7 @@ import { emptyEmpleadoForm } from '../components/empleados/empleadoForm'
 import { useToast } from '../components/ui/Toast'
 import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
+import {useRole} from "../hooks/useRole";
 
 export default function Empleados() {
   const toast = useToast()
@@ -16,6 +17,7 @@ export default function Empleados() {
   const [form, setForm] = useState(emptyEmpleadoForm)
   const [editId, setEditId] = useState(null)
   const [search, setSearch] = useState('')
+  const { can } = useRole()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -107,7 +109,9 @@ export default function Empleados() {
     <div>
       <div className="page-header">
         <div><h1>Empleados</h1><p>{items.length} empleados registrados</p></div>
-        <button className="btn-primary" onClick={openCreate}>+ Nuevo empleado</button>
+        {can('admin') && (
+          <button className="btn-primary" onClick={openCreate}>+ Nuevo empleado</button>
+        )}
       </div>
 
       <div className="card">

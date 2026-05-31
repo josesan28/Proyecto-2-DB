@@ -8,6 +8,7 @@ import VentasTable from '../components/ventas/VentasTable'
 import { initialForm, ventaReducer } from '../components/ventas/ventaFormReducer'
 import './Ventas.css'
 import './CrudPage.css'
+import {useRole} from "../hooks/useRole";
 
 export default function Ventas() {
   const toast = useToast()
@@ -21,6 +22,8 @@ export default function Ventas() {
   const [detalle, setDetalle] = useState(null)
 
   const [form, dispatch] = useReducer(ventaReducer, initialForm)
+
+  const { can } = useRole()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -100,7 +103,9 @@ export default function Ventas() {
     <div>
       <div className="page-header">
         <div><h1>Ventas</h1><p>{ventas.length} ventas registradas</p></div>
-        <button className="btn-primary" onClick={() => setModal('form')}>+ Nueva venta</button>
+        {can('vendedor') && (
+          <button className="btn-primary" onClick={() => setModal('form')}>+ Nueva venta</button>
+        )}
       </div>
 
       <div className="card">
