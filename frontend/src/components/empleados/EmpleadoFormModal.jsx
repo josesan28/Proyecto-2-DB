@@ -1,4 +1,5 @@
 import Modal from '../ui/Modal'
+import { EMPLOYEE_CARGOS } from '../../permissions'
 
 export default function EmpleadoFormModal({
   editId,
@@ -33,8 +34,15 @@ export default function EmpleadoFormModal({
           <input value={form.username} onChange={e => onFieldChange('username', e.target.value)} />
         </div>
         <div className="form-group">
-          <label>Cargo</label>
-          <input value={form.cargo} onChange={e => onFieldChange('cargo', e.target.value)} />
+          <label>Cargo *</label>
+          <select value={form.cargo} onChange={e => onFieldChange('cargo', e.target.value)}>
+            <option value="">Selecciona un cargo</option>
+            {EMPLOYEE_CARGOS.map((cargo) => (
+              <option key={cargo} value={cargo}>
+                {cargo.charAt(0).toUpperCase() + cargo.slice(1)}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="form-row">

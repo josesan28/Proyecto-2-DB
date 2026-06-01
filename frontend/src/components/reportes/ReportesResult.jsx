@@ -1,3 +1,5 @@
+import { formatReportDate, isDateLikeKey } from "./reportDate"
+
 export default function ReportesResult({ active, current, data, loading }) {
   const cols = data.length ? Object.keys(data[0]) : []
 
@@ -37,7 +39,9 @@ export default function ReportesResult({ active, current, data, loading }) {
                     <td key={c}>
                       {row[c] === null
                         ? <span style={{ color: 'var(--text-muted)' }}>null</span>
-                        : String(row[c])}
+                        : isDateLikeKey(c)
+                          ? formatReportDate(row[c])
+                          : String(row[c])}
                     </td>
                   ))}
                 </tr>

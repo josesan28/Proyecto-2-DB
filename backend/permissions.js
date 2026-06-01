@@ -1,6 +1,8 @@
-const ALL_ROLES = ["admin", "gerente", "vendedor", "bodeguero", "auditor"];
+const EMPLOYEE_CARGOS = ["admin", "gerente", "vendedor", "bodeguero", "auditor"];
+const ALL_ROLES = [...EMPLOYEE_CARGOS];
 
 module.exports = {
+  EMPLOYEE_CARGOS,
   VIEW_PRODUCTS: ALL_ROLES,
   VIEW_CATALOGS: ALL_ROLES,
   VIEW_CLIENTS: ["admin", "gerente", "vendedor", "auditor"],

@@ -3,10 +3,14 @@ import { api } from '../api'
 import EmpleadoFormModal from '../components/empleados/EmpleadoFormModal'
 import EmpleadosTable from '../components/empleados/EmpleadosTable'
 import { emptyEmpleadoForm } from '../components/empleados/empleadoForm'
+import { EMPLOYEE_CARGOS } from '../permissions'
 import { useToast } from '../components/ui/Toast'
 import { useConfirm } from '../hooks/useConfirm'
 import './CrudPage.css'
 import {useRole} from "../hooks/useRole";
+
+const normalizeCargo = (cargo = '') =>
+  cargo.toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
 export default function Empleados() {
   const toast = useToast()
@@ -34,7 +38,7 @@ export default function Empleados() {
     setForm({
       nombre_empleado: item.nombre_empleado,
       username: item.username || '',
-      cargo: item.cargo || '',
+      cargo: normalizeCargo(item.cargo || ''),
       fecha_contratacion: item.fecha_contratacion ? item.fecha_contratacion.slice(0, 10) : '',
       estado: item.estado,
       telefonos: item.telefonos.length ? item.telefonos : [''],
@@ -47,6 +51,11 @@ export default function Empleados() {
 
   const handleSubmit = async () => {
     if (!form.nombre_empleado) { toast('El nombre es obligatorio', 'warning'); return }
+    const cargo = normalizeCargo(form.cargo)
+    if (!EMPLOYEE_CARGOS.includes(cargo)) {
+      toast('Selecciona un cargo válido', 'warning')
+      return
+    }
 
     const isEdit = !!editId
     const ok = await confirm({
@@ -64,6 +73,7 @@ export default function Empleados() {
       correos: form.correos.filter(c => c.trim()),
       fecha_contratacion: form.fecha_contratacion || null,
       username: form.username || null,
+      cargo,
       contrasena: form.contrasena || null,
     }
     try {

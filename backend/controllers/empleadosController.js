@@ -1,4 +1,12 @@
 const service = require("../services/empleadosService");
+const { EMPLOYEE_CARGOS } = require("../permissions");
+
+const normalizeCargo = (cargo = "") =>
+  (cargo == null ? "" : cargo.toString())
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
 const DB_ERRORS = {
   ER_DUP_ENTRY: [409, "El username o correo ya está en uso"],
@@ -24,14 +32,20 @@ exports.getOne = async (req, res) => {
 exports.create = async (req, res) => {
   if (!req.body.nombre_empleado)
     return res.status(400).json({ error: "nombre_empleado es obligatorio" });
-  try { res.status(201).json(await service.create(req.body)); }
+  const cargo = normalizeCargo(req.body.cargo);
+  if (!EMPLOYEE_CARGOS.includes(cargo))
+    return res.status(400).json({ error: "cargo debe ser uno de: admin, gerente, vendedor, bodeguero, auditor" });
+  try { res.status(201).json(await service.create({ ...req.body, cargo })); }
   catch (err) { handle(err, res); }
 };
 
 exports.update = async (req, res) => {
   if (!req.body.nombre_empleado)
     return res.status(400).json({ error: "nombre_empleado es obligatorio" });
-  try { res.json(await service.update(req.params.id, req.body)); }
+  const cargo = normalizeCargo(req.body.cargo);
+  if (!EMPLOYEE_CARGOS.includes(cargo))
+    return res.status(400).json({ error: "cargo debe ser uno de: admin, gerente, vendedor, bodeguero, auditor" });
+  try { res.json(await service.update(req.params.id, { ...req.body, cargo })); }
   catch (err) { handle(err, res); }
 };
 

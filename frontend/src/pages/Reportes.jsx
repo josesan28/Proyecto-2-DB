@@ -3,6 +3,7 @@ import { api } from '../api'
 import BarChart from '../components/ui/BarChart'
 import ReportesMenu from '../components/reportes/ReportesMenu'
 import ReportesResult from '../components/reportes/ReportesResult'
+import { formatReportDate } from '../components/reportes/reportDate'
 import { REPORTES } from '../components/reportes/reportesConfig'
 import { useToast } from '../components/ui/Toast'
 import './Reportes.css'
@@ -23,7 +24,7 @@ const CHART_CONFIG = {
   },
   'ventas-por-periodo': {
     title: 'Facturación por día dentro del período (Q)',
-    getLabel: row => row.fecha,
+    getLabel: row => formatReportDate(row.fecha),
     getValue: row => parseFloat(row.total_facturado),
     unit: 'Q ',
   },

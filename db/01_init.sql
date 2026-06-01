@@ -79,7 +79,7 @@ CREATE TABLE empleado (
     nombre_empleado    VARCHAR(150)    NOT NULL,
     username           VARCHAR(60)     NULL,
     hash_contrasena    VARCHAR(255)    NULL,
-    cargo              VARCHAR(100)    NULL,
+    cargo              ENUM('admin','gerente','vendedor','bodeguero','auditor') NOT NULL,
     fecha_contratacion DATE            NULL,
     estado             ENUM('activo','inactivo') NOT NULL DEFAULT 'activo',
     CONSTRAINT pk_empleado   PRIMARY KEY (id_empleado),

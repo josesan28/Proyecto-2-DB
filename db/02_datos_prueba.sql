@@ -59,21 +59,21 @@ INSERT INTO correo_proveedor (id_proveedor, correo) VALUES
 
 -- EMPLEADOS
 INSERT INTO empleado (nombre_empleado, username, hash_contrasena, cargo, fecha_contratacion, estado) VALUES
-('José Sanchez',    'josesan',  '$2a$10$ZLSNHefmGewDJdzLSWNRG.ZIOGBuvJKjAaZgrQ5oGYngDWiP9AvSS', 'Vendedor', '2018-03-15', 'activo'),
+('José Sanchez',    'josesan',  '$2a$10$ZLSNHefmGewDJdzLSWNRG.ZIOGBuvJKjAaZgrQ5oGYngDWiP9AvSS', 'vendedor', '2018-03-15', 'activo'),
 ('Admin de Prueba',     'admin',     '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin',     '2024-01-01', 'activo'),
 ('Gerente de Prueba',    'gerente',   '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'gerente',   '2024-01-01', 'activo'),
 ('Vendedor de Prueba',      'vendedor',  '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'vendedor',  '2024-01-01', 'activo'),
 ('Bodeguero de Prueba',     'bodeguero', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'bodeguero', '2024-01-01', 'activo'),
 ('Auditor de Prueba',    'auditor',   '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'auditor',   '2024-01-01', 'activo'),
-('Ana Lucía Rodríguez',     'ana.rodriguez',   '$2b$12$def1234567890ABCDEFGHIJ', 'Jefe de Ventas',     '2019-07-01', 'activo'),
-('Diego Fuentes López',     'diego.fuentes',   '$2b$12$ghi1234567890ABCDEFGHIJ', 'Vendedor',           '2020-01-10', 'activo'),
-('María José García',       'maria.garcia',    '$2b$12$jkl1234567890ABCDEFGHIJ', 'Vendedora',          '2020-06-20', 'activo'),
-('Luis Fernando Torres',    'luis.torres',     '$2b$12$mno1234567890ABCDEFGHIJ', 'Cajero',             '2021-02-14', 'activo'),
-('Sofía Hernández Ruiz',    'sofia.hernandez', '$2b$12$pqr1234567890ABCDEFGHIJ', 'Cajera',             '2021-09-03', 'activo'),
-('Roberto Castillo Vega',   'roberto.castillo','$2b$12$stu1234567890ABCDEFGHIJ', 'Bodeguero',          '2022-04-18', 'activo'),
-('Gabriela Morales Soto',   'gabriela.morales','$2b$12$vwx1234567890ABCDEFGHIJ', 'Atención al Cliente','2022-11-07', 'activo'),
-('José Ramírez Aguilar',    'jose.ramirez',    '$2b$12$yza1234567890ABCDEFGHIJ', 'Vendedor',           '2023-05-22', 'activo'),
-('Valeria Ortiz Chan',      'valeria.ortiz',   '$2b$12$yzb1234567890ABCDEFGHIJ', 'Asistente',          '2024-01-08', 'activo');
+('Ana Lucía Rodríguez',     'ana.rodriguez',   '$2b$12$def1234567890ABCDEFGHIJ', 'gerente',            '2019-07-01', 'activo'),
+('Diego Fuentes López',     'diego.fuentes',   '$2b$12$ghi1234567890ABCDEFGHIJ', 'vendedor',           '2020-01-10', 'activo'),
+('María José García',       'maria.garcia',    '$2b$12$jkl1234567890ABCDEFGHIJ', 'vendedor',           '2020-06-20', 'activo'),
+('Luis Fernando Torres',    'luis.torres',     '$2b$12$mno1234567890ABCDEFGHIJ', 'vendedor',           '2021-02-14', 'activo'),
+('Sofía Hernández Ruiz',    'sofia.hernandez', '$2b$12$pqr1234567890ABCDEFGHIJ', 'vendedor',           '2021-09-03', 'activo'),
+('Roberto Castillo Vega',   'roberto.castillo','$2b$12$stu1234567890ABCDEFGHIJ', 'bodeguero',          '2022-04-18', 'activo'),
+('Gabriela Morales Soto',   'gabriela.morales','$2b$12$vwx1234567890ABCDEFGHIJ', 'vendedor',           '2022-11-07', 'activo'),
+('José Ramírez Aguilar',    'jose.ramirez',    '$2b$12$yza1234567890ABCDEFGHIJ', 'vendedor',           '2023-05-22', 'activo'),
+('Valeria Ortiz Chan',      'valeria.ortiz',   '$2b$12$yzb1234567890ABCDEFGHIJ', 'auditor',            '2024-01-08', 'activo');
 
 -- Teléfonos de empleados
 INSERT INTO telefono_empleado (id_empleado, telefono) VALUES

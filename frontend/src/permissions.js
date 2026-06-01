@@ -1,4 +1,5 @@
-const ALL_ROLES = ["admin", "gerente", "vendedor", "bodeguero", "auditor"];
+export const EMPLOYEE_CARGOS = ["admin", "gerente", "vendedor", "bodeguero", "auditor"];
+const ALL_ROLES = [...EMPLOYEE_CARGOS];
 
 export const PAGE_ROLES = {
   home: ALL_ROLES,
