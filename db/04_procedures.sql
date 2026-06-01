@@ -1,5 +1,5 @@
 -- Stored Procedures
-USE tienda_db;
+USE tienda_db_proyecto3;
 
 DELIMITER $$
 

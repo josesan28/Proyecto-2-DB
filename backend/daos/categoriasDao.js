@@ -12,11 +12,14 @@ exports.insert = async ({ nombre_categoria, descripcion_categoria }) => {
 };
 
 exports.update = async (id, { nombre_categoria, descripcion_categoria }) => {
-  const [affected] = await Categoria.update(
+  const existing = await Categoria.findByPk(id);
+  if (!existing) return 0;
+
+  await Categoria.update(
     { nombre_categoria, descripcion_categoria: descripcion_categoria ?? null },
     { where: { id_categoria: id } }
   );
-  return affected;
+  return 1;
 };
 
 exports.remove = async (id) => {

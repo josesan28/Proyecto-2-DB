@@ -1,6 +1,6 @@
 --  Proyecto 3 - Script de datos de prueba
 
-USE tienda_db;
+USE tienda_db_proyecto3;
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 

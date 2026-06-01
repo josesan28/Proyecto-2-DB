@@ -19,6 +19,8 @@ const handle = (err, res) => {
   res.status(err.status ?? 500).json({ error: err.message });
 };
 
+const hasRequiredName = (value) => typeof value === "string" && value.trim();
+
 exports.getAll = async (req, res) => {
   try { res.json(await service.getAll()); }
   catch (err) { handle(err, res); }
@@ -30,7 +32,7 @@ exports.getOne = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  if (!req.body.nombre_empleado)
+  if (!hasRequiredName(req.body.nombre_empleado))
     return res.status(400).json({ error: "nombre_empleado es obligatorio" });
   const cargo = normalizeCargo(req.body.cargo);
   if (!EMPLOYEE_CARGOS.includes(cargo))
@@ -40,7 +42,7 @@ exports.create = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  if (!req.body.nombre_empleado)
+  if (!hasRequiredName(req.body.nombre_empleado))
     return res.status(400).json({ error: "nombre_empleado es obligatorio" });
   const cargo = normalizeCargo(req.body.cargo);
   if (!EMPLOYEE_CARGOS.includes(cargo))

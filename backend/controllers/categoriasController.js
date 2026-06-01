@@ -11,6 +11,8 @@ const handle = (err, res) => {
   res.status(err.status ?? 500).json({ error: err.message });
 };
 
+const hasRequiredName = (value) => typeof value === "string" && value.trim();
+
 exports.getAll = async (req, res) => {
   try { res.json(await service.getAll()); }
   catch (err) { handle(err, res); }
@@ -23,7 +25,7 @@ exports.getOne = async (req, res) => {
 
 exports.create = async (req, res) => {
   const { nombre_categoria, descripcion_categoria } = req.body;
-  if (!nombre_categoria)
+  if (!hasRequiredName(nombre_categoria))
     return res.status(400).json({ error: "nombre_categoria es obligatorio" });
   try { res.status(201).json(await service.create({ nombre_categoria, descripcion_categoria })); }
   catch (err) { handle(err, res); }
@@ -31,7 +33,7 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   const { nombre_categoria, descripcion_categoria } = req.body;
-  if (!nombre_categoria)
+  if (!hasRequiredName(nombre_categoria))
     return res.status(400).json({ error: "nombre_categoria es obligatorio" });
   try { res.json(await service.update(req.params.id, { nombre_categoria, descripcion_categoria })); }
   catch (err) { handle(err, res); }

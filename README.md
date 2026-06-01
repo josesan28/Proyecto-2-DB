@@ -6,11 +6,15 @@ Extensión del Proyecto 2 con seguridad a nivel de base de datos:
 roles y permisos en el DBMS, stored procedures y ORM (Sequelize). 
 Se siguió trabajando con el tema del sistema para una tienda que maneja ingreso de productos por categoría, gestión de empleados, proveedores, vista de reportes y registro de ventas.
 
-## Requisitos
+## Link del proyecto desplegado
+
+https://eka-qtlh.onrender.com
+
+## Requisitos para levantarlo localmente
 
 - Docker y Docker Compose
 
-## Levantar el proyecto
+## Levantar el proyecto localmente
 
 ### Clonar y entrar al repositorio
 ```bash

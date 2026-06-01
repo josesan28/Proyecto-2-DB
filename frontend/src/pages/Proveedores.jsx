@@ -42,7 +42,7 @@ export default function Proveedores() {
   }
 
   const handleSubmit = async () => {
-    if (!form.nombre_proveedor) { toast('El nombre es obligatorio', 'warning'); return }
+    if (!form.nombre_proveedor.trim()) { toast('El nombre es obligatorio', 'warning'); return }
 
     const isEdit = !!editId
     const ok = await confirm({
@@ -56,6 +56,7 @@ export default function Proveedores() {
 
     const payload = {
       ...form,
+      nombre_proveedor: form.nombre_proveedor.trim(),
       telefonos: form.telefonos.filter(t => t.trim()),
       correos: form.correos.filter(c => c.trim()),
     }

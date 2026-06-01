@@ -2,11 +2,11 @@
 --  DDL - MySQL
 
 
-CREATE DATABASE IF NOT EXISTS tienda_db
+CREATE DATABASE IF NOT EXISTS tienda_db_proyecto3
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE tienda_db;
+USE tienda_db_proyecto3;
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 

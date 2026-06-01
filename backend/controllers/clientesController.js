@@ -10,6 +10,8 @@ const handle = (err, res) => {
   res.status(err.status ?? 500).json({ error: err.message });
 };
 
+const hasRequiredName = (value) => typeof value === "string" && value.trim();
+
 exports.getAll = async (req, res) => {
   try { res.json(await service.getAll()); }
   catch (err) { handle(err, res); }
@@ -21,14 +23,14 @@ exports.getOne = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  if (!req.body.nombre_cliente)
+  if (!hasRequiredName(req.body.nombre_cliente))
     return res.status(400).json({ error: "nombre_cliente es obligatorio" });
   try { res.status(201).json(await service.create(req.body)); }
   catch (err) { handle(err, res); }
 };
 
 exports.update = async (req, res) => {
-  if (!req.body.nombre_cliente)
+  if (!hasRequiredName(req.body.nombre_cliente))
     return res.status(400).json({ error: "nombre_cliente es obligatorio" });
   try { res.json(await service.update(req.params.id, req.body)); }
   catch (err) { handle(err, res); }
@@ -40,7 +42,7 @@ exports.remove = async (req, res) => {
 };
 
 exports.upsertPorProcedimiento = async (req, res) => {
-  if (!req.body.nombre_cliente)
+  if (!hasRequiredName(req.body.nombre_cliente))
     return res.status(400).json({ error: "nombre_cliente es obligatorio" });
   try {
     const result = await service.upsertPorProcedimiento(req.body);

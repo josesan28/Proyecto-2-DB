@@ -51,8 +51,9 @@ export default function Productos() {
   }
 
   const handleSubmit = async () => {
-    if (!form.nombre_producto || !form.precio_compra || !form.precio_venta
-        || !form.id_categoria || !form.id_proveedor || !form.descripcion_producto) {
+    if (!form.nombre_producto.trim() || !form.descripcion_producto.trim()
+        || form.precio_compra === '' || form.precio_venta === ''
+        || !form.id_categoria || !form.id_proveedor) {
       toast('Completa todos los campos obligatorios', 'warning'); return
     }
 
@@ -68,10 +69,18 @@ export default function Productos() {
 
     try {
       if (isEdit) {
-        await api.put(`/api/productos/${editId}`, form)
+        await api.put(`/api/productos/${editId}`, {
+          ...form,
+          nombre_producto: form.nombre_producto.trim(),
+          descripcion_producto: form.descripcion_producto.trim(),
+        })
         toast('Producto actualizado')
       } else {
-        await api.post('/api/productos', form)
+        await api.post('/api/productos', {
+          ...form,
+          nombre_producto: form.nombre_producto.trim(),
+          descripcion_producto: form.descripcion_producto.trim(),
+        })
         toast('Producto creado')
       }
       setModal(null); load()

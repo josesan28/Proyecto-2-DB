@@ -42,7 +42,7 @@ export default function Clientes() {
   }
 
   const handleSubmit = async () => {
-    if (!form.nombre_cliente) { toast('El nombre es obligatorio', 'warning'); return }
+    if (!form.nombre_cliente.trim()) { toast('El nombre es obligatorio', 'warning'); return }
 
     const isEdit = !!editId
     const ok = await confirm({
@@ -56,6 +56,7 @@ export default function Clientes() {
 
     const payload = {
       ...form,
+      nombre_cliente: form.nombre_cliente.trim(),
       telefonos: form.telefonos.filter(t => t.trim()),
       correos: form.correos.filter(c => c.trim()),
     }

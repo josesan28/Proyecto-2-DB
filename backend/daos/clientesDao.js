@@ -44,11 +44,13 @@ exports.insert = async ({ nombre_cliente, observaciones, telefonos = [], correos
 exports.update = async (id, { nombre_cliente, observaciones, telefonos = [], correos = [] }) => {
   const { sequelize } = require("../models");
   return sequelize.transaction(async (t) => {
-    const [affected] = await Cliente.update(
+    const existing = await Cliente.findByPk(id, { transaction: t });
+    if (!existing) return 0;
+
+    await Cliente.update(
       { nombre_cliente, observaciones: observaciones ?? null },
       { where: { id_cliente: id }, transaction: t }
     );
-    if (!affected) return 0;
     await TelefonoCliente.destroy({ where: { id_cliente: id }, transaction: t });
     await CorreoCliente.destroy({   where: { id_cliente: id }, transaction: t });
     await TelefonoCliente.bulkCreate(
@@ -59,7 +61,7 @@ exports.update = async (id, { nombre_cliente, observaciones, telefonos = [], cor
       correos.map((correo) => ({ id_cliente: id, correo })),
       { transaction: t }
     );
-    return affected;
+    return 1;
   });
 };
 

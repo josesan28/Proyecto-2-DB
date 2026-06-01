@@ -36,7 +36,7 @@ export default function Categorias() {
   }
 
   const handleSubmit = async () => {
-    if (!form.nombre_categoria) { toast('El nombre es obligatorio', 'warning'); return }
+    if (!form.nombre_categoria.trim()) { toast('El nombre es obligatorio', 'warning'); return }
 
     const isEdit = !!editId
     const ok = await confirm({
@@ -50,10 +50,16 @@ export default function Categorias() {
 
     try {
       if (isEdit) {
-        await api.put(`/api/categorias/${editId}`, form)
+        await api.put(`/api/categorias/${editId}`, {
+          ...form,
+          nombre_categoria: form.nombre_categoria.trim(),
+        })
         toast('Categoría actualizada')
       } else {
-        await api.post('/api/categorias', form)
+        await api.post('/api/categorias', {
+          ...form,
+          nombre_categoria: form.nombre_categoria.trim(),
+        })
         toast('Categoría creada')
       }
       setModal(null); load()

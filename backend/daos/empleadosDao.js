@@ -65,14 +65,16 @@ exports.update = async (id, {
 }) => {
   const { sequelize } = require("../models");
   return sequelize.transaction(async (t) => {
+    const existing = await Empleado.findByPk(id, { transaction: t });
+    if (!existing) return 0;
+
     const fields = { nombre_empleado, username: username ?? null,
                      cargo: cargo ?? null, fecha_contratacion: fecha_contratacion ?? null, estado };
     if (hashContrasena) fields.hash_contrasena = hashContrasena;
 
-    const [affected] = await Empleado.update(fields, {
+    await Empleado.update(fields, {
       where: { id_empleado: id }, transaction: t,
     });
-    if (!affected) return 0;
 
     await TelefonoEmpleado.destroy({ where: { id_empleado: id }, transaction: t });
     await CorreoEmpleado.destroy({   where: { id_empleado: id }, transaction: t });
@@ -84,7 +86,7 @@ exports.update = async (id, {
       correos.map((correo) => ({ id_empleado: id, correo })),
       { transaction: t }
     );
-    return affected;
+    return 1;
   });
 };
 

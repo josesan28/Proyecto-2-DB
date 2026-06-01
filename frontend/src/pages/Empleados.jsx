@@ -50,7 +50,7 @@ export default function Empleados() {
   }
 
   const handleSubmit = async () => {
-    if (!form.nombre_empleado) { toast('El nombre es obligatorio', 'warning'); return }
+    if (!form.nombre_empleado.trim()) { toast('El nombre es obligatorio', 'warning'); return }
     const cargo = normalizeCargo(form.cargo)
     if (!EMPLOYEE_CARGOS.includes(cargo)) {
       toast('Selecciona un cargo válido', 'warning')
@@ -69,6 +69,7 @@ export default function Empleados() {
 
     const payload = {
       ...form,
+      nombre_empleado: form.nombre_empleado.trim(),
       telefonos: form.telefonos.filter(t => t.trim()),
       correos: form.correos.filter(c => c.trim()),
       fecha_contratacion: form.fecha_contratacion || null,

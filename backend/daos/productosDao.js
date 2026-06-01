@@ -26,12 +26,15 @@ exports.update = async (id, {
   id_categoria, id_proveedor, nombre_producto, descripcion_producto,
   precio_compra, precio_venta, stock_actual = 0,
 }) => {
-  const [affected] = await Producto.update(
+  const existing = await Producto.findByPk(id);
+  if (!existing) return 0;
+
+  await Producto.update(
     { id_categoria, id_proveedor, nombre_producto, descripcion_producto,
       precio_compra, precio_venta, stock_actual },
     { where: { id_producto: id } }
   );
-  return affected;
+  return 1;
 };
 
 exports.remove = async (id) =>
