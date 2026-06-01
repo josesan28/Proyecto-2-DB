@@ -1,6 +1,11 @@
 const pool = require("../db/pool");
 const dao = require("../daos/clientesDao");
 
+const firstRow = async (conn, sql, params = []) => {
+  const [rows] = await conn.query(sql, params);
+  return Array.isArray(rows) ? rows[0] : rows;
+};
+
 exports.getAll = () => dao.findAll();
 
 exports.getOne = async (id) => {
@@ -34,7 +39,7 @@ exports.upsertPorProcedimiento = async ({ id_cliente, nombre_cliente, observacio
       [id_cliente ?? null, nombre_cliente, observaciones ?? null]
     );
 
-    const [[out]] = await conn.query("SELECT @result_id AS result_id, @error AS error");
+    const out = await firstRow(conn, "SELECT @result_id AS result_id, @error AS error");
 
     if (out.error) {
       const err = new Error(out.error);

@@ -1,6 +1,11 @@
 const dao = require("../daos/ventasDao");
 const pool = require("../db/pool");
 
+const firstRow = async (conn, sql, params = []) => {
+  const [rows] = await conn.query(sql, params);
+  return Array.isArray(rows) ? rows[0] : rows;
+};
+
 exports.getAll = () => dao.findAll();
 
 exports.getOne = async (id) => {
@@ -19,12 +24,13 @@ exports.create = async ({ id_empleado, id_cliente, items }) => {
       }))
     );
 
-    const [[result]] = await conn.query(
+    await conn.query(
       "CALL sp_registrar_venta(?, ?, ?, @id_venta, @error)",
       [id_empleado, id_cliente ?? null, itemsJson]
     );
 
-    const [[out]] = await conn.query(
+    const out = await firstRow(
+      conn,
       "SELECT @id_venta AS id_venta, @error AS error"
     );
 
@@ -45,7 +51,7 @@ exports.remove = async (id) => {
   try {
     await conn.query("CALL sp_anular_venta(?, @error)", [id]);
 
-    const [[out]] = await conn.query("SELECT @error AS error");
+    const out = await firstRow(conn, "SELECT @error AS error");
 
     if (out.error) {
       const err = new Error(out.error);

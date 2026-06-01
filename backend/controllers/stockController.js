@@ -1,5 +1,10 @@
 const pool = require("../db/pool");
 
+const firstRow = async (conn, sql, params = []) => {
+  const [rows] = await conn.query(sql, params);
+  return Array.isArray(rows) ? rows[0] : rows;
+};
+
 exports.ajustar = async (req, res) => {
   const { cantidad } = req.body;
   const id = req.params.id;
@@ -10,7 +15,8 @@ exports.ajustar = async (req, res) => {
   const conn = await pool.getConnection();
   try {
     await conn.query("CALL sp_ajustar_stock(?, ?, @stock_nuevo, @error)", [id, cantidad]);
-    const [[out]] = await conn.query(
+    const out = await firstRow(
+      conn,
       "SELECT @stock_nuevo AS stock_nuevo, @error AS error"
     );
 
